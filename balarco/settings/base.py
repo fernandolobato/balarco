@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'clients.apps.ClientsConfig',
     'works.apps.WorksConfig',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -75,7 +76,10 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
 }
 
 WSGI_APPLICATION = 'balarco.wsgi.application'
