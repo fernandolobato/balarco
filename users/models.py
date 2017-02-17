@@ -7,10 +7,11 @@ from django.db.models.signals import post_save
 
 
 class UserProfile(models.Model):
-	user = models.OneToOneField(User)
-	profile_picture = models.ImageField(upload_to='media/profile_pictures')
+    user = models.OneToOneField(User)
+    profile_picture = models.ImageField(upload_to='media/profile_pictures')
+
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_authentication_token(sender, instance=None, created=False, **kwargs):
-	if created:
-		Token.objects.create(user=instance)
+    if created:
+        Token.objects.create(user=instance)
