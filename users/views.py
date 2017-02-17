@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout
 
 from rest_framework.views import APIView
 
-from .authentication import QuietBasicAuthentication
+#from .authentication import QuietBasicAuthentication
 
 class APILogin(APIView):
 	pass
