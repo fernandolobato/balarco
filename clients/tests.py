@@ -1,6 +1,7 @@
 from django.test import TestCase
 from .models import Client
 
+
 class ClientTestCase(TestCase):
     def setUp(self):
         Client.objects.create(name="Test Starbucks", address="Felipe Ángeles 225")
