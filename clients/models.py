@@ -7,3 +7,17 @@ class Client(models.Model):
 
     def __str__(self):
         return self.name
+
+class Contact(models.Model):
+	client = models.ForeignKey('Client')
+
+	name = models.CharField(max_length=255)
+	last_name = models.CharField(max_length=255)
+	email = models.EmailField(max_length=255)
+	alternate_email = models.EmailField(max_length=255)
+	phone = models.CharField(max_length=50)
+	alternate_phone = models.CharField(max_length=50)
+	is_active = models.BooleanField(default=True)
+
+	def __str__(self):
+		return '%s %s' % (self.name, self.last_name)
