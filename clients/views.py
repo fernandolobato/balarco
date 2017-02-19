@@ -4,14 +4,15 @@ from rest_framework import permissions
 from clients.models import Contact
 from clients.serializers import ContactSerializer
 
+
 class APIContact(ListCreateAPIView):
 	"""
 		API view to create, list or edit client.
 
 		@TODO: Change permissions to isAuthenticated once tokens are enables.
-	
+
 		This Controller allows a user to consume and create information from
-		contacts through a REST API using JSON format. 
+		contacts through a REST API using JSON format.
 
 		Parameters
 		----------

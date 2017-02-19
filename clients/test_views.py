@@ -5,16 +5,19 @@ from rest_framework.test import APITestCase, APIRequestFactory, force_authentica
 from clients.models import Client, Contact
 from clients.views import APIContact
 
+
 class ContactTest(APITestCase):
 	"""
 		Tests to verify the basic usage of the REST API to create, modify and list contacts.
 		@TODO: Token authentication is not yet enabled. Once it's enabled, the force_authenticate methods
 		should recieve the user and token as params.
 	"""
-	
+
 	def setUp(self):
-		self.client_instance_starbucks = Client.objects.create(name='Test Starbucks', address='Felipe Ángeles 225')
-		
+		self.client_instance_starbucks = Client.objects.create(
+			name='Test Starbucks',
+			address='Felipe Ángeles 225')
+
 		self.contact_instance_julian = Contact.objects.create(
 			name='Julian',
 			last_name='Niebieskikiwat',
@@ -22,7 +25,7 @@ class ContactTest(APITestCase):
 			email='julian@elguandul.com',
 			alternate_email='julio@hotmail.com',
 			alternate_phone='26416231',
-			client = self.client_instance_starbucks)
+			client=self.client_instance_starbucks)
 
 		self.contact_instance_hector = Contact.objects.create(
 			name='Hector',
@@ -31,7 +34,7 @@ class ContactTest(APITestCase):
 			email='hector@eldominio.com',
 			alternate_email='elotro@eldominio.com',
 			alternate_phone='5555555',
-			client = self.client_instance_starbucks)
+			client=self.client_instance_starbucks)
 
 		self.number_of_contacts = 2
 		self.url = 'clients:api_contact'
@@ -44,7 +47,7 @@ class ContactTest(APITestCase):
 		"""
 
 		data = {
-			'name':'Fernando',
+			'name': 'Fernando',
 			'last_name': 'Lobato Meeser',
 			'email': 'lobato.meeser.fernando@hotmail.com',
 			'phone': '4424674323',
@@ -80,15 +83,6 @@ class ContactTest(APITestCase):
 		request = self.factory.post(reverse(self.url), data=data)
 		force_authenticate(request)
 		response = self.view(request)
-		tags = ['name','last_name', 'email', 'client']
-		for tag in tags :
+		tags = ['name', 'last_name', 'email', 'client']
+		for tag in tags:
 			self.assertEqual(str(response.data[tag]), "['This field is required.']")
-
-	#def test_individual_contact_listing(self):
-		"""
-			Tests that an individual client object can be retrieved through the REST API endpoint.
-		"""		
-		# request = self.factory.get(reverse(self.url, kwargs={'contact': self.contact_instance_julian.id}))
-		# force_authenticate(request)
-		# response = self.view(request)
-		# self.assertEqual(1, len(response.data))

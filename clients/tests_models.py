@@ -14,8 +14,8 @@ class ClientTestCase(TestCase):
         self.assertEqual(str(starbucks), 'Test Starbucks')
         self.assertEqual(str(oxxo), 'Test OXXO')
 
-class ContactTestCase(ClientTestCase):
 
+class ContactTestCase(ClientTestCase):
 	def setUp(self):
 		starbucks = Client.objects.create(name='Test Starbucks', address='Felipe Ángeles 225')
 		Client.objects.create(name='Test OXXO', address='Reforma 190')
@@ -27,7 +27,7 @@ class ContactTestCase(ClientTestCase):
 			email='lobato.meeser.fernando@hotmail.com',
 			alternate_email='ferlobo93@hotmail.com',
 			alternate_phone='2341631',
-			client = starbucks)
+			client=starbucks)
 
 	def test_contact_name(self):
 		'''

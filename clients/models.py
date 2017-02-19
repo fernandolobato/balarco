@@ -8,6 +8,7 @@ class Client(models.Model):
     def __str__(self):
         return self.name
 
+
 class Contact(models.Model):
 	client = models.ForeignKey('Client')
 

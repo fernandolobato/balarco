@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from clients.models import Client, Contact
 
+
 class ContactSerializer(serializers.ModelSerializer):
 
 	class Meta:
@@ -17,11 +18,11 @@ class ContactSerializer(serializers.ModelSerializer):
 			'client'
 		)
 
+
 class ClientSerializer(serializers.ModelSerializer):
-	
+
 	contacts = ContactSerializer(many=True)
 
 	class Meta:
 		model = Client
-		fields = ('id','name', 'address', 'contacts')
-
+		fields = ('id', 'name', 'address', 'contacts')
