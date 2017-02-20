@@ -1,14 +1,18 @@
 from django.test import TestCase
 from django.db import IntegrityError
 from .models import User
+from django.core.urlresolvers import reverse
+from rest_framework.test import APITestCase
 
 
 class UserTest(TestCase):
     def setUp(self):
-        User.objects.create(username='marcoantonio', first_name='Marco', last_name='Lopez',
-                            email='marcolm485@gmail.com', password='marcolopez')
-        User.objects.create(username='juliannieb', first_name='Julian', last_name='Niebieskikwiat',
-                            email='juliannieb@gmail.com', password='juliannieb')
+        User.objects.create_user(
+            username='marcoantonio', first_name='Marco', last_name='Lopez',
+            email='marcolm485@gmail.com', password='marcolopez')
+        User.objects.create_user(
+            username='juliannieb', first_name='Julian', last_name='Niebieskikwiat',
+            email='juliannieb@gmail.com', password='juliannieb')
 
     def test_username(self):
         user_marco = User.objects.get(username='marcoantonio')
@@ -43,3 +47,27 @@ class UserTest(TestCase):
         with self.assertRaises(IntegrityError):
             User.objects.create(username='eduardovaca', first_name='Eduardo', last_name='Vaca',
                                 email='vacalalo@gmail.com', password='eduardovaca')
+
+
+class TokenCreationTest(APITestCase):
+    def setUp(self):
+        User.objects.create_user(
+            username='marcoantonio', first_name='Marco',
+            last_name='Lopez', email='marcolm485@gmail.com',
+            password='marcolopez')
+        User.objects.create_user(
+            username='juliannieb', first_name='Julian',
+            last_name='Niebieskikwiat', email='juliannieb@gmail.com',
+            password='juliannieb')
+
+    def test_return_authentication_token(self):
+        url = reverse('users:api_login')
+        data = {'username': 'juliannieb', 'password': 'juliannieb'}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+    def test_do_not_return_authentication_token(self):
+        url = reverse('users:api_login')
+        data = {'username': 'juliannieb', 'password': 'incorrect_password'}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 400)
