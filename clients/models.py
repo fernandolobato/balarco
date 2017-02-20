@@ -10,15 +10,15 @@ class Client(models.Model):
 
 
 class Contact(models.Model):
-	client = models.ForeignKey('Client')
+    client = models.ForeignKey('Client')
 
-	name = models.CharField(max_length=255)
-	last_name = models.CharField(max_length=255)
-	email = models.EmailField(max_length=255)
-	alternate_email = models.EmailField(max_length=255, blank=True)
-	phone = models.CharField(max_length=50, blank=True)
-	alternate_phone = models.CharField(max_length=50, blank=True)
-	is_active = models.BooleanField(default=True)
+    name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255)
+    alternate_email = models.EmailField(max_length=255, blank=True)
+    phone = models.CharField(max_length=50, blank=True)
+    alternate_phone = models.CharField(max_length=50, blank=True)
+    is_active = models.BooleanField(default=True)
 
-	def __str__(self):
-		return '%s %s' % (self.name, self.last_name)
+    def __str__(self):
+        return '{} {}'.format(self.name, self.last_name)
