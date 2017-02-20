@@ -18,6 +18,16 @@ class ContactSerializer(serializers.ModelSerializer):
             'client'
         )
 
+    def create(self, validated_data):
+        if 'id' in self.context['request'].data:
+            pk = self.context['request'].data['id']
+            Contact.objects.filter(id=pk).update(**validated_data)
+            contact = Contact.objects.get(id=pk)
+        else:
+            contact = Contact.objects.create(**validated_data)
+            contact.save()
+        return contact
+
 
 class ClientSerializer(serializers.ModelSerializer):
 

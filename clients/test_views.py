@@ -1,6 +1,7 @@
 from django.core.urlresolvers import reverse
 
 from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
+from rest_framework import status
 
 from clients.models import Client, Contact
 from clients.views import APIContact
@@ -60,6 +61,7 @@ class ContactTest(APITestCase):
 
         contact_instance = Contact.objects.get(id=response.data['id'])
 
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual('Fernando', contact_instance.name)
         self.assertEqual(self.number_of_contacts + 1, Contact.objects.all().count())
 
@@ -71,6 +73,7 @@ class ContactTest(APITestCase):
         force_authenticate(request)
         response = self.view(request)
 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.number_of_contacts, len(response.data))
         for client in response.data:
             self.assertEqual(client['name'], Contact.objects.get(id=client['id']).name)
@@ -83,6 +86,29 @@ class ContactTest(APITestCase):
         request = self.factory.post(reverse(self.url), data=data)
         force_authenticate(request)
         response = self.view(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         tags = ['name', 'last_name', 'email', 'client']
         for tag in tags:
             self.assertEqual(str(response.data[tag]), "['This field is required.']")
+
+    def test_modify_contact(self):
+        """
+            Test that a client object can be modified.
+        """
+        data = {
+            'id': self.contact_instance_julian.id,
+            'name': 'Julian',
+            'last_name': 'Niebieskikiwat',
+            'email': 'julian@elguandul.com',
+            'phone': '66666666',
+            'alternate_email': 'julio@hotmail.com',
+            'alternate_phone': '2341631',
+            'client': self.client_instance_starbucks.id
+            }
+        request = self.factory.post(reverse(self.url), data=data)
+        force_authenticate(request)
+        response = self.view(request)
+
+        instance_update = Contact.objects.get(id=self.contact_instance_julian.id)
+        self.assertEqual(instance_update.phone, '66666666')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
