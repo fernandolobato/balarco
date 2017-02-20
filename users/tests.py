@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.db import IntegrityError
-from users.models import UserProfile, User
+from .models import UserProfile, User
 
 class UserTest(TestCase):
 	def setUp(self):

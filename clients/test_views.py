@@ -3,8 +3,8 @@ from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
 from rest_framework import status
 
-from clients.models import Client, Contact
-from clients.views import APIContact
+from .models import Client, Contact
+from .views import APIContact
 
 
 class ContactTest(APITestCase):
