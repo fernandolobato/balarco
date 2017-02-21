@@ -7,10 +7,12 @@ from rest_framework.authentication import TokenAuthentication, SessionAuthentica
 from clients.models import Client, Contact
 from clients.serializers import ClientSerializer, ClientSerializerComplete, ContactSerializer
 
+
 def delete_queryset(queryset):
     for obj in queryset:
         obj.is_active = False
         obj.save()
+
 
 class APIContact(ListCreateAPIView):
     """
