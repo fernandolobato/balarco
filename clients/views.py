@@ -7,6 +7,10 @@ from rest_framework.authentication import TokenAuthentication, SessionAuthentica
 from clients.models import Client, Contact
 from clients.serializers import ClientSerializer, ClientSerializerComplete, ContactSerializer
 
+def delete_queryset(queryset):
+    for obj in queryset:
+        obj.is_active = False
+        obj.save()
 
 class APIContact(ListCreateAPIView):
     """
@@ -44,7 +48,7 @@ class ClientViewSet(viewsets.ViewSet):
     serializer_class = ClientSerializer
 
     def list(self, request):
-        queryset = Client.objects.all()
+        queryset = Client.objects.filter(is_active=True)
         serializer = ClientSerializerComplete(queryset, many=True)
         return Response(serializer.data)
 
@@ -65,10 +69,34 @@ class ClientViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def update(self, request, pk=None):
-        pass
+        queryset = Client.objects.filter(is_active=True)
+        client = get_object_or_404(queryset, pk=pk)
+        serializer = ClientSerializer(client, data=request.data, partial=False)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response({
+            'status': 'Bad request',
+            'message': 'Client could not be updated with received data.'
+        }, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk=None):
-        pass
+        queryset = Client.objects.filter(is_active=True)
+        client = get_object_or_404(queryset, pk=pk)
+        serializer = ClientSerializer(client, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response({
+            'status': 'Bad request',
+            'message': 'Client could not be updated with received data.'
+        }, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
-        pass
+        queryset = Client.objects.filter(is_active=True)
+        client = get_object_or_404(queryset, pk=pk)
+        client.is_active = False
+        client.save()
+        delete_queryset(Contact.objects.filter(client=client))
+        serializer = ClientSerializerComplete(queryset, many=True)
+        return Response(serializer.data)
