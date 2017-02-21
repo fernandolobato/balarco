@@ -9,6 +9,14 @@ class Client(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if not self.is_active:
+            queryset = Contact.objects.filter(client=self)
+            for contact in queryset:
+                contact.is_active = False
+                contact.save()
+        super(Client, self).save(*args, **kwargs)
+
 
 class Contact(models.Model):
     client = models.ForeignKey(Client, related_name='contacts', on_delete=models.CASCADE)

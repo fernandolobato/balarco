@@ -93,25 +93,23 @@ class ClientViewSet(viewsets.ViewSet):
     """
 
     authentication_classes = (TokenAuthentication, SessionAuthentication)
+    obj_class = Client
     serializer_class = ClientSerializer
 
     def list(self, request):
-        return generic_rest_list_objects(request, self.serializer_class, Client)
+        return generic_rest_list_objects(request, self.serializer_class, self.obj_class)
 
     def create(self, request):
-        return generic_rest_create_object(request, self.serializer_class, Client)
+        return generic_rest_create_object(request, self.serializer_class, self.obj_class)
 
     def retrieve(self, request, pk=None):
-        return generic_rest_retrieve_object(request, self.serializer_class, Client, pk)
+        return generic_rest_retrieve_object(request, self.serializer_class, self.obj_class, pk)
 
     def update(self, request, pk=None):
-        return generic_rest_update_object(request, self.serializer_class, Client, pk, False)
+        return generic_rest_update_object(request, self.serializer_class, self.obj_class, pk, False)
 
     def partial_update(self, request, pk=None):
-        return generic_rest_update_object(request, self.serializer_class, Client, pk, True)
+        return generic_rest_update_object(request, self.serializer_class, self.obj_class, pk, True)
 
     def destroy(self, request, pk=None):
-        queryset = Client.objects.filter(is_active=True)
-        client = get_object_or_404(queryset, pk=pk)
-        delete_queryset(Contact.objects.filter(client=client))
-        return generic_rest_soft_delete(request, self.serializer_class, Client, pk)
+        return generic_rest_soft_delete(request, self.serializer_class, self.obj_class, pk)
