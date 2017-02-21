@@ -31,14 +31,7 @@ class ContactSerializer(serializers.ModelSerializer):
 
 class ClientSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = Client
-        fields = ('id', 'name', 'address')
-
-
-class ClientSerializerComplete(serializers.ModelSerializer):
-
-    contacts = ContactSerializer(many=True)
+    contacts = ContactSerializer(many=True, read_only=True)
 
     class Meta:
         model = Client

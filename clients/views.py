@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 
 from clients.models import Client, Contact
-from clients.serializers import ClientSerializer, ClientSerializerComplete, ContactSerializer
+from clients.serializers import ClientSerializer, ContactSerializer
 
 
 def delete_queryset(queryset):
@@ -51,7 +51,7 @@ class ClientViewSet(viewsets.ViewSet):
 
     def list(self, request):
         queryset = Client.objects.filter(is_active=True)
-        serializer = ClientSerializerComplete(queryset, many=True)
+        serializer = ClientSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def create(self, request):
@@ -67,7 +67,7 @@ class ClientViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         queryset = Client.objects.all()
         client = get_object_or_404(queryset, pk=pk)
-        serializer = ClientSerializerComplete(client)
+        serializer = ClientSerializer(client)
         return Response(serializer.data)
 
     def update(self, request, pk=None):
@@ -100,5 +100,5 @@ class ClientViewSet(viewsets.ViewSet):
         client.is_active = False
         client.save()
         delete_queryset(Contact.objects.filter(client=client))
-        serializer = ClientSerializerComplete(queryset, many=True)
+        serializer = ClientSerializer(queryset, many=True)
         return Response(serializer.data)
