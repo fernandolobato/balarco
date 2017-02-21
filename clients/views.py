@@ -61,7 +61,7 @@ class ClientViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         queryset = Client.objects.all()
         client = get_object_or_404(queryset, pk=pk)
-        serializer = ClientSerializer(client)
+        serializer = ClientSerializerComplete(client)
         return Response(serializer.data)
 
     def update(self, request, pk=None):
