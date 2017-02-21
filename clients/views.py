@@ -16,7 +16,7 @@ class APIContact(ListCreateAPIView):
         contact : int (optional)
             Can return a single instnce of an object instead of a complete query.
     """
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ContactSerializer
 
     def get_queryset(self):

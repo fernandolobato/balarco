@@ -1,6 +1,8 @@
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 
 from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
+from rest_framework.authtoken.models import Token
 from rest_framework import status
 
 from .models import Client, Contact
@@ -37,6 +39,10 @@ class ContactTest(APITestCase):
             alternate_phone='5555555',
             client=self.client_instance_starbucks)
 
+        User.objects.create_user(
+            username='marcoantonio', first_name='Marco', last_name='Lopez',
+            email='marcolm485@gmail.com', password='marcolopez')
+
         self.number_of_contacts = 2
         self.url = 'clients:api_contact'
         self.factory = APIRequestFactory()
@@ -46,7 +52,7 @@ class ContactTest(APITestCase):
         """
             Test that a client instance can be generated through the REST API endpoint.
         """
-
+        user = User.objects.all()[0]
         data = {
             'name': 'Fernando',
             'last_name': 'Lobato Meeser',
@@ -56,7 +62,8 @@ class ContactTest(APITestCase):
             'alternate_phone': '2341631',
             'client': self.client_instance_starbucks.id}
         request = self.factory.post(reverse(self.url), data=data)
-        force_authenticate(request)
+        token = Token.objects.get(user=user)
+        force_authenticate(request, user=user, token=token)
         response = self.view(request)
 
         contact_instance = Contact.objects.get(id=response.data['id'])
@@ -69,8 +76,10 @@ class ContactTest(APITestCase):
         """
             Tests that all client objects can be retrieved through the REST API endpoint.
         """
+        user = User.objects.all()[0]
         request = self.factory.get(reverse(self.url))
-        force_authenticate(request)
+        token = Token.objects.get(user=user)
+        force_authenticate(request, user=user, token=token)
         response = self.view(request)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -82,9 +91,11 @@ class ContactTest(APITestCase):
         """
             Tests that a client object can't be created without the required information.
         """
+        user = User.objects.all()[0]
         data = {}
         request = self.factory.post(reverse(self.url), data=data)
-        force_authenticate(request)
+        token = Token.objects.get(user=user)
+        force_authenticate(request, user=user, token=token)
         response = self.view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         tags = ['name', 'last_name', 'email', 'client']
@@ -95,6 +106,7 @@ class ContactTest(APITestCase):
         """
             Test that a client object can be modified.
         """
+        user = User.objects.all()[0]
         data = {
             'id': self.contact_instance_julian.id,
             'name': 'Julian',
@@ -106,7 +118,8 @@ class ContactTest(APITestCase):
             'client': self.client_instance_starbucks.id
             }
         request = self.factory.post(reverse(self.url), data=data)
-        force_authenticate(request)
+        token = Token.objects.get(user=user)
+        force_authenticate(request, user=user, token=token)
         response = self.view(request)
 
         instance_update = Contact.objects.get(id=self.contact_instance_julian.id)
