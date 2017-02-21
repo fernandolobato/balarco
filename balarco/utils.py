@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 
@@ -73,7 +73,8 @@ class GenericViewSet(viewsets.ViewSet):
         return generic_rest_retrieve_object(request, self.serializer_class, self.obj_class, pk)
 
     def update(self, request, pk=None):
-        return generic_rest_update_object(request, self.serializer_class, self.obj_class, pk, False)
+        return generic_rest_update_object(request, self.serializer_class,
+                                          self.obj_class, pk, False)
 
     def partial_update(self, request, pk=None):
         return generic_rest_update_object(request, self.serializer_class, self.obj_class, pk, True)
