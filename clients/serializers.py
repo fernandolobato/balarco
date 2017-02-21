@@ -31,6 +31,13 @@ class ContactSerializer(serializers.ModelSerializer):
 
 class ClientSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = Client
+        fields = ('id', 'name', 'address')
+
+
+class ClientSerializerComplete(serializers.ModelSerializer):
+
     contacts = ContactSerializer(many=True)
 
     class Meta:

@@ -1,9 +1,11 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListCreateAPIView
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 
 from clients.models import Client, Contact
-from clients.serializers import ClientSerializer, ContactSerializer
+from clients.serializers import ClientSerializer, ClientSerializerComplete, ContactSerializer
 
 
 class APIContact(ListCreateAPIView):
@@ -38,16 +40,29 @@ class ClientViewSet(viewsets.ViewSet):
     the `format=None` keyword argument for each action.
     """
 
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    serializer_class = ClientSerializer
+
     def list(self, request):
         queryset = Client.objects.all()
-        serializer = ClientSerializer(queryset, many=True)
+        serializer = ClientSerializerComplete(queryset, many=True)
         return Response(serializer.data)
 
     def create(self, request):
-        pass
+        serializer = ClientSerializer(data=request.data)
+        if serializer.is_valid():
+            Client.objects.create(**serializer.validated_data)
+            return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
+        return Response({
+            'status': 'Bad request',
+            'message': 'Client could not be created with received data.'
+        }, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
-        pass
+        queryset = Client.objects.all()
+        client = get_object_or_404(queryset, pk=pk)
+        serializer = ClientSerializer(client)
+        return Response(serializer.data)
 
     def update(self, request, pk=None):
         pass
