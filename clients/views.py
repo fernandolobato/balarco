@@ -1,8 +1,9 @@
 from rest_framework.generics import ListCreateAPIView
-from rest_framework import permissions
+from rest_framework import viewsets, permissions
+from rest_framework.response import Response
 
-from clients.models import Contact
-from clients.serializers import ContactSerializer
+from clients.models import Client, Contact
+from clients.serializers import ClientSerializer, ContactSerializer
 
 
 class APIContact(ListCreateAPIView):
@@ -26,3 +27,33 @@ class APIContact(ListCreateAPIView):
             queryset = queryset.filter(id=self.kwargs['contact'])
 
         return queryset
+
+
+class ClientViewSet(viewsets.ViewSet):
+    """
+    Example empty viewset demonstrating the standard
+    actions that will be handled by a router class.
+
+    If you're using format suffixes, make sure to also include
+    the `format=None` keyword argument for each action.
+    """
+
+    def list(self, request):
+        queryset = Client.objects.all()
+        serializer = ClientSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        pass
+
+    def retrieve(self, request, pk=None):
+        pass
+
+    def update(self, request, pk=None):
+        pass
+
+    def partial_update(self, request, pk=None):
+        pass
+
+    def destroy(self, request, pk=None):
+        pass
