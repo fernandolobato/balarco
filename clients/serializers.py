@@ -9,6 +9,7 @@ class ContactSerializer(serializers.ModelSerializer):
         model = Contact
         fields = (
             'id',
+            'is_active',
             'name',
             'last_name',
             'phone',
