@@ -13,5 +13,7 @@ class UserProfile(models.Model):
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_authentication_token(sender, instance=None, created=False, **kwargs):
+    """ When a new user is created and saved, function 
+    creates a Token object for the created user """
     if created:
         Token.objects.create(user=instance)

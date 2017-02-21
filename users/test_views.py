@@ -1,7 +1,7 @@
-from .models import User
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
+from .models import User
 
 
 class TokenCreationTest(APITestCase):
