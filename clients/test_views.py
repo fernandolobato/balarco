@@ -1,10 +1,10 @@
 from django.core.urlresolvers import reverse
-
+from django.contrib.auth.models import User
 from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
 from rest_framework import status
 
 from .models import Client, Contact
-from .views import APIContact
+from .views import ContactViewSet
 
 
 class ContactTest(APITestCase):
@@ -15,9 +15,13 @@ class ContactTest(APITestCase):
     """
 
     def setUp(self):
+        self.user = User.objects.create_user(username='test_user',
+                                             password='test_password')
+
         self.client_instance_starbucks = Client.objects.create(
             name='Test Starbucks',
-            address='Felipe Ángeles 225')
+            address='Felipe Ángeles 225',
+            is_active=True)
 
         self.contact_instance_julian = Contact.objects.create(
             name='Julian',
@@ -26,7 +30,8 @@ class ContactTest(APITestCase):
             email='julian@elguandul.com',
             alternate_email='julio@hotmail.com',
             alternate_phone='26416231',
-            client=self.client_instance_starbucks)
+            client=self.client_instance_starbucks,
+            is_active=True)
 
         self.contact_instance_hector = Contact.objects.create(
             name='Hector',
@@ -35,16 +40,17 @@ class ContactTest(APITestCase):
             email='hector@eldominio.com',
             alternate_email='elotro@eldominio.com',
             alternate_phone='5555555',
-            client=self.client_instance_starbucks)
+            client=self.client_instance_starbucks,
+            is_active=True)
 
         self.number_of_contacts = 2
-        self.url = 'clients:api_contact'
+        self.url_list = 'clients:Contacts-list'
+        self.url_detail = 'clients:Contacts-detail'
         self.factory = APIRequestFactory()
-        self.view = APIContact.as_view()
 
     def test_contact_creation(self):
         """
-            Test that a client instance can be generated through the REST API endpoint.
+            Test that a contact instance can be generated through the REST API endpoint.
         """
 
         data = {
@@ -54,11 +60,14 @@ class ContactTest(APITestCase):
             'phone': '4424674323',
             'alternate_email': 'ferlobo93@hotmail.com',
             'alternate_phone': '2341631',
-            'client': self.client_instance_starbucks.id}
-        request = self.factory.post(reverse(self.url), data=data)
-        force_authenticate(request)
-        response = self.view(request)
-
+            'client': self.client_instance_starbucks.id,
+            'is_active': True}
+        request = self.factory.post(reverse(self.url_list), data=data)
+        force_authenticate(request, user=self.user)
+        view = ContactViewSet.as_view({
+                                      'post': 'create',
+                                      })
+        response = view(request)
         contact_instance = Contact.objects.get(id=response.data['id'])
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -67,11 +76,14 @@ class ContactTest(APITestCase):
 
     def test_multiple_contact_listing(self):
         """
-            Tests that all client objects can be retrieved through the REST API endpoint.
+            Tests that all contact objects can be retrieved through the REST API endpoint.
         """
-        request = self.factory.get(reverse(self.url))
-        force_authenticate(request)
-        response = self.view(request)
+        request = self.factory.get(reverse(self.url_list))
+        force_authenticate(request, user=self.user)
+        view = ContactViewSet.as_view({
+                                      'get': 'list',
+                                      })
+        response = view(request)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.number_of_contacts, len(response.data))
@@ -80,35 +92,40 @@ class ContactTest(APITestCase):
 
     def test_empty_contact_creation(self):
         """
-            Tests that a client object can't be created without the required information.
+            Tests that a contact object can't be created without the required information.
         """
         data = {}
-        request = self.factory.post(reverse(self.url), data=data)
-        force_authenticate(request)
-        response = self.view(request)
+        request = self.factory.post(reverse(self.url_list), data=data)
+        force_authenticate(request, user=self.user)
+        view = ContactViewSet.as_view({
+                                      'post': 'create',
+                                      })
+        response = view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        tags = ['name', 'last_name', 'email', 'client']
-        for tag in tags:
-            self.assertEqual(str(response.data[tag]), "['This field is required.']")
 
     def test_modify_contact(self):
         """
             Test that a client object can be modified.
         """
         data = {
-            'id': self.contact_instance_julian.id,
             'name': 'Julian',
             'last_name': 'Niebieskikiwat',
             'email': 'julian@elguandul.com',
             'phone': '66666666',
             'alternate_email': 'julio@hotmail.com',
             'alternate_phone': '2341631',
-            'client': self.client_instance_starbucks.id
+            'client': self.client_instance_starbucks.id,
+            'is_active': True
             }
-        request = self.factory.post(reverse(self.url), data=data)
-        force_authenticate(request)
-        response = self.view(request)
+        request = self.factory.put(reverse(self.url_detail,
+                                           kwargs={'pk': self.contact_instance_julian.id}),
+                                   data=data)
+        force_authenticate(request, user=self.user)
+        view = ContactViewSet.as_view({
+                                      'put': 'update',
+                                      })
+        response = view(request, pk=self.contact_instance_julian.id)
 
         instance_update = Contact.objects.get(id=self.contact_instance_julian.id)
         self.assertEqual(instance_update.phone, '66666666')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

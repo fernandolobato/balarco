@@ -7,14 +7,13 @@ from rest_framework.authentication import TokenAuthentication, SessionAuthentica
 def generic_rest_list_objects(request, serializer_class, obj_class):
     queryset = obj_class.objects.filter(is_active=True)
     serializer = serializer_class(queryset, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status.HTTP_200_OK)
 
 
 def generic_rest_create_object(request, serializer_class, obj_class):
     serializer = serializer_class(data=request.data)
     if serializer.is_valid():
         new_obj = obj_class.objects.create(**serializer.validated_data)
-        print(serializer.validated_data)
         return Response(serializer_class(new_obj).data, status=status.HTTP_201_CREATED)
     return Response({
         'status': 'Bad request',
@@ -26,7 +25,7 @@ def generic_rest_retrieve_object(request, serializer_class, obj_class, pk):
     queryset = obj_class.objects.filter(is_active=True)
     obj = get_object_or_404(queryset, pk=pk)
     serializer = serializer_class(obj)
-    return Response(serializer.data)
+    return Response(serializer.data, status.HTTP_200_OK)
 
 
 def generic_rest_update_object(request, serializer_class, obj_class, pk, partial_update):
@@ -34,8 +33,8 @@ def generic_rest_update_object(request, serializer_class, obj_class, pk, partial
     obj = get_object_or_404(queryset, pk=pk)
     serializer = serializer_class(obj, data=request.data, partial=partial_update)
     if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
+        updated_obj = serializer.save()
+        return Response(serializer_class(updated_obj).data, status.HTTP_200_OK)
     return Response({
         'status': 'Bad request',
         'message': '%s could not be updated with received data.' % obj_class.__name__
@@ -48,7 +47,7 @@ def generic_rest_soft_delete(request, serializer_class, obj_class, pk):
     obj.is_active = False
     obj.save()
     serializer = serializer_class(queryset, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status.HTTP_200_OK)
 
 
 class GenericViewSet(viewsets.ViewSet):
