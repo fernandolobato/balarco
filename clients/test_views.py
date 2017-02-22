@@ -43,10 +43,6 @@ class ContactTest(APITestCase):
             client=self.client_instance_starbucks,
             is_active=True)
 
-        User.objects.create_user(
-            username='marcoantonio', first_name='Marco', last_name='Lopez',
-            email='marcolm485@gmail.com', password='marcolopez')
-
         self.number_of_contacts = 2
         self.url_list = 'clients:contacts-list'
         self.url_detail = 'clients:contacts-detail'
