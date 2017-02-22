@@ -116,6 +116,32 @@ class GenericViewSet(viewsets.ViewSet):
 class GenericAPITest(APITestCase):
     """
         Tests to verify the basic usage of the REST API to create, modify and list objects.
+        To use, a new class that inherits from utils.GenericAPITest has to be declared.
+        The setUp function and its attributes must be overriden:
+            -self.user: test user created on the DB for authentication
+            -self.obj_class: model class of the API REST that's being tested
+            -self.test_objects: array containing all the object_class objects 
+                    created and saved in the test DB
+            -self.number_of_initial_objects: size of the test objects array->len(self.test_objects)
+            -self.data_creation_test: dictionary containing necessary data to create an object
+                    succesfuly
+            -self.data_edition_test: dictionary containing necessary data to edit an object
+                    succesfuly
+            -self.edition_obj_idx: index of the object in the array of objects
+                    that's going to be edited in the test with the data_edition_test dict.
+            -self.view: GenericViewSet that's being tested with a dict of http methods. Example:
+                    ObjectViewSet.as_view({
+                                'get': 'list',
+                                'post': 'create',
+                                'put': 'update',
+                                'patch': 'partial_update',
+                                'delete': 'destroy'
+                                })
+            -self.url_list: location of the viewset-list API without reversing it.
+                    Example: 'app:objects-list'
+            -self.url_detail: location of the viewset-detail API without reversing it.
+                    Example: 'app:objects-detail'
+            -self.factory: factory to construct requests, it must be always = APIRequestFactory()
     """
 
     def setUp(self):
