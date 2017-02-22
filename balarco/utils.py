@@ -1,7 +1,11 @@
 from django.shortcuts import get_object_or_404
+from django.core.urlresolvers import reverse
+from django.forms.models import model_to_dict
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
+from rest_framework.authtoken.models import Token
 
 
 def generic_rest_list_objects(request, serializer_class, obj_class):
@@ -107,3 +111,88 @@ class GenericViewSet(viewsets.ViewSet):
 
     def destroy(self, request, pk=None):
         return generic_rest_soft_delete(request, self.serializer_class, self.obj_class, pk)
+
+
+class GenericAPITest(APITestCase):
+    """
+        Tests to verify the basic usage of the REST API to create, modify and list objects.
+    """
+
+    def setUp(self):
+        self.user = None
+        self.obj_class = None
+        self.test_objects = []
+        self.number_of_initial_objects = 0
+        self.data_creation_test = {}
+        self.data_edition_test = {}
+        self.edition_obj_idx = 0
+        self.view = None
+        self.url_list = ''
+        self.url_detail = ''
+        self.factory = APIRequestFactory()
+
+    def test_contact_creation(self):
+        """
+            Test that an object instance can be generated through the REST API endpoint.
+        """
+        request = self.factory.post(reverse(self.url_list), data=self.data_creation_test)
+        token = Token.objects.get(user=self.user)
+        force_authenticate(request, user=self.user, token=token)
+        response = self.view(request)
+
+        object_instance = self.obj_class.objects.get(id=response.data['id'])
+        object_instance_dict = model_to_dict(object_instance)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        for key in self.data_creation_test.keys():
+            if key in object_instance_dict:
+                self.assertEqual(self.data_creation_test[key], object_instance_dict[key])
+        self.assertEqual(self.number_of_initial_objects + 1, self.obj_class.objects.all().count())
+
+    def test_multiple_contact_listing(self):
+        """
+            Tests that all class objects can be retrieved through the REST API endpoint.
+        """
+        request = self.factory.get(reverse(self.url_list))
+        token = Token.objects.get(user=self.user)
+        force_authenticate(request, user=self.user, token=token)
+        response = self.view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.number_of_initial_objects, len(response.data))
+        for obj in response.data:
+            object_instance = self.obj_class.objects.get(id=obj['id'])
+            object_instance_dict = model_to_dict(object_instance)
+            for key in obj.keys():
+                if key in object_instance_dict:
+                    self.assertEqual(obj[key], object_instance_dict[key])
+
+    def test_empty_contact_creation(self):
+        """
+            Tests that an object can't be created without the required information.
+        """
+        data = {}
+        request = self.factory.post(reverse(self.url_list), data=data)
+        token = Token.objects.get(user=self.user)
+        force_authenticate(request, user=self.user, token=token)
+        response = self.view(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_modify_contact(self):
+        """
+            Test that an object can be modified.
+        """
+        edit_obj_instance = self.test_objects[self.edition_obj_idx]
+        request = self.factory.put(reverse(self.url_detail,
+                                           kwargs={'pk': edit_obj_instance.id}),
+                                   data=self.data_edition_test)
+        token = Token.objects.get(user=self.user)
+        force_authenticate(request, user=self.user, token=token)
+        response = self.view(request, pk=edit_obj_instance.id)
+
+        object_instance = self.obj_class.objects.get(id=edit_obj_instance.id)
+        object_instance_dict = model_to_dict(object_instance)
+        for key in self.data_edition_test.keys():
+            if key in object_instance_dict:
+                self.assertEqual(self.data_edition_test[key], object_instance_dict[key])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
