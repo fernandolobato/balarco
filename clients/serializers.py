@@ -9,13 +9,16 @@ class ContactSerializer(serializers.ModelSerializer):
         model = Contact
         fields = (
             'id',
-            'is_active',
             'name',
             'last_name',
-            'phone',
+            'charge',
+            'landline',
+            'extension',
+            'mobile_phone_1',
+            'mobile_phone_2',
             'email',
             'alternate_email',
-            'alternate_phone',
+            'is_active',
             'client'
         )
 

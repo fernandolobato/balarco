@@ -26,20 +26,21 @@ class ContactTest(APITestCase):
         self.contact_instance_julian = Contact.objects.create(
             name='Julian',
             last_name='Niebieskikiwat',
-            phone='4471172395',
+            charge='Manager',
+            landline='4471172395',
+            mobile_phone_1='26416231',
             email='julian@elguandul.com',
             alternate_email='julio@hotmail.com',
-            alternate_phone='26416231',
             client=self.client_instance_starbucks,
             is_active=True)
 
         self.contact_instance_hector = Contact.objects.create(
             name='Hector',
             last_name='Sanchez',
-            phone='4426683012',
+            charge='Developer',
+            landline='4426683012',
+            mobile_phone_1='5555555',
             email='hector@eldominio.com',
-            alternate_email='elotro@eldominio.com',
-            alternate_phone='5555555',
             client=self.client_instance_starbucks,
             is_active=True)
 
@@ -52,14 +53,14 @@ class ContactTest(APITestCase):
         """
             Test that a contact instance can be generated through the REST API endpoint.
         """
-
         data = {
             'name': 'Fernando',
             'last_name': 'Lobato Meeser',
+            'charge': 'Project Owner',
+            'landline': '4424674323',
+            'mobile_phone_1': '2341631',
             'email': 'lobato.meeser.fernando@hotmail.com',
-            'phone': '4424674323',
             'alternate_email': 'ferlobo93@hotmail.com',
-            'alternate_phone': '2341631',
             'client': self.client_instance_starbucks.id,
             'is_active': True}
         request = self.factory.post(reverse(self.url_list), data=data)
@@ -110,10 +111,11 @@ class ContactTest(APITestCase):
         data = {
             'name': 'Julian',
             'last_name': 'Niebieskikiwat',
+            'charge': 'Manager',
+            'landline': '66666666',
+            'mobile_phone_1': '2341631',
             'email': 'julian@elguandul.com',
-            'phone': '66666666',
             'alternate_email': 'julio@hotmail.com',
-            'alternate_phone': '2341631',
             'client': self.client_instance_starbucks.id,
             'is_active': True
             }
@@ -127,7 +129,7 @@ class ContactTest(APITestCase):
         response = view(request, pk=self.contact_instance_julian.id)
 
         instance_update = Contact.objects.get(id=self.contact_instance_julian.id)
-        self.assertEqual(instance_update.phone, '66666666')
+        self.assertEqual(instance_update.landline, '66666666')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 

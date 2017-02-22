@@ -23,10 +23,11 @@ class ContactTestCase(ClientTestCase):
         Contact.objects.create(
             name='Fernando',
             last_name='Lobato Meeser',
-            phone='4424674323',
+            charge='Project Owner',
+            landline='4424674323',
+            mobile_phone_1='2341631',
             email='lobato.meeser.fernando@hotmail.com',
             alternate_email='ferlobo93@hotmail.com',
-            alternate_phone='2341631',
             client=starbucks)
 
     def test_contact_name(self):
