@@ -1,6 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
+from rest_framework.authtoken.models import Token
 from rest_framework import status
 
 from .models import Client, Contact
@@ -44,6 +45,10 @@ class ContactTest(APITestCase):
             client=self.client_instance_starbucks,
             is_active=True)
 
+        User.objects.create_user(
+            username='marcoantonio', first_name='Marco', last_name='Lopez',
+            email='marcolm485@gmail.com', password='marcolopez')
+
         self.number_of_contacts = 2
         self.url_list = 'clients:Contacts-list'
         self.url_detail = 'clients:Contacts-detail'
@@ -64,7 +69,8 @@ class ContactTest(APITestCase):
             'client': self.client_instance_starbucks.id,
             'is_active': True}
         request = self.factory.post(reverse(self.url_list), data=data)
-        force_authenticate(request, user=self.user)
+        token = Token.objects.get(user=self.user)
+        force_authenticate(request, user=self.user, token=token)
         view = ContactViewSet.as_view({
                                       'post': 'create',
                                       })
@@ -80,7 +86,8 @@ class ContactTest(APITestCase):
             Tests that all contact objects can be retrieved through the REST API endpoint.
         """
         request = self.factory.get(reverse(self.url_list))
-        force_authenticate(request, user=self.user)
+        token = Token.objects.get(user=self.user)
+        force_authenticate(request, user=self.user, token=token)
         view = ContactViewSet.as_view({
                                       'get': 'list',
                                       })
@@ -97,7 +104,8 @@ class ContactTest(APITestCase):
         """
         data = {}
         request = self.factory.post(reverse(self.url_list), data=data)
-        force_authenticate(request, user=self.user)
+        token = Token.objects.get(user=self.user)
+        force_authenticate(request, user=self.user, token=token)
         view = ContactViewSet.as_view({
                                       'post': 'create',
                                       })
@@ -122,7 +130,8 @@ class ContactTest(APITestCase):
         request = self.factory.put(reverse(self.url_detail,
                                            kwargs={'pk': self.contact_instance_julian.id}),
                                    data=data)
-        force_authenticate(request, user=self.user)
+        token = Token.objects.get(user=self.user)
+        force_authenticate(request, user=self.user, token=token)
         view = ContactViewSet.as_view({
                                       'put': 'update',
                                       })
