@@ -13,9 +13,9 @@ def generic_rest_list_objects(request, serializer_class, obj_class):
 def generic_rest_create_object(request, serializer_class, obj_class):
     serializer = serializer_class(data=request.data)
     if serializer.is_valid():
-        obj_class.objects.create(**serializer.validated_data)
+        new_obj = obj_class.objects.create(**serializer.validated_data)
         print(serializer.validated_data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer_class(new_obj).data, status=status.HTTP_201_CREATED)
     return Response({
         'status': 'Bad request',
         'message': '%s could not be created with received data.' % obj_class.__name__
