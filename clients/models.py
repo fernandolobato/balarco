@@ -10,6 +10,11 @@ class Client(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        """
+        Override of save function.
+        If the is_active field is false, it means that the object was deleted so it starts
+        a CASCADE soft deletion over all model dependencies.
+        """
         if not self.is_active:
             queryset = Contact.objects.filter(client=self)
             for contact in queryset:

@@ -11,8 +11,6 @@ from .views import ContactViewSet, ClientViewSet
 class ContactTest(APITestCase):
     """
         Tests to verify the basic usage of the REST API to create, modify and list contacts.
-        @TODO: Token authentication is not yet enabled. Once it's enabled, the
-        force_authenticate methods should recieve the user and token as params.
     """
 
     def setUp(self):
@@ -50,8 +48,8 @@ class ContactTest(APITestCase):
             email='marcolm485@gmail.com', password='marcolopez')
 
         self.number_of_contacts = 2
-        self.url_list = 'clients:Contacts-list'
-        self.url_detail = 'clients:Contacts-detail'
+        self.url_list = 'clients:contacts-list'
+        self.url_detail = 'clients:contacts-detail'
         self.factory = APIRequestFactory()
 
     def test_contact_creation(self):
@@ -145,8 +143,6 @@ class ContactTest(APITestCase):
 class ClientTest(APITestCase):
     """
         Tests to verify the basic usage of the REST API to create, modify and list clients.
-        @TODO: Token authentication is not yet enabled. Once it's enabled, the
-        force_authenticate methods should recieve the user and token as params.
     """
 
     def setUp(self):
@@ -164,8 +160,8 @@ class ClientTest(APITestCase):
             is_active=True)
 
         self.number_of_clients = 2
-        self.url_list = 'clients:Clients-list'
-        self.url_detail = 'clients:Clients-detail'
+        self.url_list = 'clients:clients-list'
+        self.url_detail = 'clients:clients-detail'
         self.factory = APIRequestFactory()
 
     def test_client_creation(self):
@@ -218,7 +214,7 @@ class ClientTest(APITestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_modify_contact(self):
+    def test_modify_client(self):
         """
             Test that a client object can be modified.
         """

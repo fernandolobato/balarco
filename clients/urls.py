@@ -6,8 +6,8 @@ from . import views
 app_name = 'clients'
 
 router = routers.DefaultRouter()
-router.register(r'clients', views.ClientViewSet, base_name='Clients')
-router.register(r'contacts', views.ContactViewSet, base_name='Contacts')
+router.register(r'clients', views.ClientViewSet, base_name='clients')
+router.register(r'contacts', views.ContactViewSet, base_name='contacts')
 
 urlpatterns = [
     url(r'^', include(router.urls)),
