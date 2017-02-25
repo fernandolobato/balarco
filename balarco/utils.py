@@ -120,7 +120,7 @@ class GenericAPITest(APITestCase):
         The setUp function and its attributes must be overriden:
             -self.user: test user created on the DB for authentication
             -self.obj_class: model class of the API REST that's being tested
-            -self.test_objects: array containing all the object_class objects 
+            -self.test_objects: array containing all the object_class objects
                     created and saved in the test DB
             -self.number_of_initial_objects: size of the test objects array->len(self.test_objects)
             -self.data_creation_test: dictionary containing necessary data to create an object
