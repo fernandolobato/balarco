@@ -48,7 +48,7 @@ class Work(models.Model):
     name = models.CharField(max_length=100)
     expected_delivery_date = models.DateField()
     brief = models.TextField()
-    final_link = models.CharField(max_length=1000)
+    final_link = models.CharField(max_length=1000, blank=True)
 
 
 class ArtWork(models.Model):
