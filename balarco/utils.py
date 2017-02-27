@@ -34,7 +34,7 @@ def generic_rest_list_objects(request, serializer_class, obj_class):
 def generic_rest_create_object(request, serializer_class, obj_class):
     """Function used in GenericViewSet:create to create and save a
     new object of the specified class.
-    
+
     Parameters
     ----------
     request: request
@@ -62,7 +62,7 @@ def generic_rest_create_object(request, serializer_class, obj_class):
 def generic_rest_retrieve_object(request, serializer_class, obj_class, pk):
     """Function used by GenericViewSet:retrieve to retrieve the data of specified object.
     The object must be active to get it.
-    
+
     Parameters
     ----------
     request: request
@@ -89,7 +89,7 @@ def generic_rest_update_object(request, serializer_class, obj_class, pk, partial
     """Function used by GenericViewSet:update and GenericViewSet:partial_update to edit
     the data of the specified object.
     The object must be active to edit it.
-    
+
     Parameters
     ----------
     request: request
@@ -124,7 +124,7 @@ def generic_rest_soft_delete(request, serializer_class, obj_class, pk):
     """Function used by GenericViewSet:destroy to make a soft delete of the specified object.
     This means that the object is not truly deleted but its active state change to false.
     The object must be active to delete it.
-    
+
     Parameters
     ----------
     request: request
@@ -196,7 +196,7 @@ class GenericAPITest(APITestCase):
         Test user created on the DB for authentication
     self.obj_class: Model class
         Model class of the API REST that's being tested
-    self.test_objects: 
+    self.test_objects:
         Array containing all the object_class objects created and saved in the test DB
     self.number_of_initial_objects: int
         Size of the test objects array->len(self.test_objects)
@@ -205,7 +205,7 @@ class GenericAPITest(APITestCase):
     self.data_edition_test: dict
         Dictionary containing necessary data to edit an object succesfuly
     self.edition_obj_idx: int
-        Index of the object in the array of objects that's going to be edited in the 
+        Index of the object in the array of objects that's going to be edited in the
         test with the data_edition_test dict.
     self.view: GenericViewSet
         GenericViewSet that's being tested with a dict of http methods.
