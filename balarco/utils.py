@@ -9,9 +9,15 @@ from rest_framework.authtoken.models import Token
 
 
 STATUS = (
-    (0, 'Diseño'),
-    (1, 'No'),
-    (2, 'Unknown'),
+    (0, 'Pendiente'),
+    (1, 'Diseño'),
+    (2, 'Cuentas'),
+    (3, 'Validación'),
+    (4, 'Producción'),
+    (5, 'Por cobrar'),
+    (6, 'Por facturar'),
+    (7, 'Pagado'),
+    (8, 'Terminado')
 )
 
 
