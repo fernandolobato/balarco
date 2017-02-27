@@ -22,9 +22,22 @@ STATUS = (
 
 
 def generic_rest_list_objects(request, serializer_class, obj_class):
-    """
-    Function to list all objects of a model in GenericViewSet:list.
+    """Function to list all objects of a model in GenericViewSet:list.
     It makes a Query to the specified object class geting all active objects
+
+    Parameters
+    ----------
+    request: request
+        The request that was made by the client
+    serializer_class: class
+        Class of the model serializer
+    obj_class: class
+        Class of the model
+
+    Returns
+    -------
+    Response
+        Response object containing the serializer data
     """
     queryset = obj_class.objects.filter(is_active=True)
     serializer = serializer_class(queryset, many=True)
@@ -32,9 +45,22 @@ def generic_rest_list_objects(request, serializer_class, obj_class):
 
 
 def generic_rest_create_object(request, serializer_class, obj_class):
-    """
-    Function used in GenericViewSet:create to create and save a
+    """Function used in GenericViewSet:create to create and save a
     new object of the specified class.
+
+    Parameters
+    ----------
+    request: request
+        The request that was made by the client
+    serializer_class: class
+        Class of the model serializer
+    obj_class: class
+        Class of the model
+
+    Returns
+    -------
+    Response
+        Response object containing the serializer data
     """
     serializer = serializer_class(data=request.data)
     if serializer.is_valid():
@@ -47,9 +73,24 @@ def generic_rest_create_object(request, serializer_class, obj_class):
 
 
 def generic_rest_retrieve_object(request, serializer_class, obj_class, pk):
-    """
-    Function used by GenericViewSet:retrieve to retrieve the data of specified object.
+    """Function used by GenericViewSet:retrieve to retrieve the data of specified object.
     The object must be active to get it.
+
+    Parameters
+    ----------
+    request: request
+        The request that was made by the client
+    serializer_class: class
+        Class of the model serializer
+    obj_class: class
+        Class of the model
+    pk: int
+        Id of the requested object
+
+    Returns
+    -------
+    Response
+        Response object containing the serializer data
     """
     queryset = obj_class.objects.filter(is_active=True)
     obj = get_object_or_404(queryset, pk=pk)
@@ -58,12 +99,27 @@ def generic_rest_retrieve_object(request, serializer_class, obj_class, pk):
 
 
 def generic_rest_update_object(request, serializer_class, obj_class, pk, partial_update):
-    """
-    Function used by GenericViewSet:update and GenericViewSet:partial_update to edit
+    """Function used by GenericViewSet:update and GenericViewSet:partial_update to edit
     the data of the specified object.
-    It receives a boolean called partial_update depending on which type of request is being
-    handled (PUT/PATCH).
     The object must be active to edit it.
+
+    Parameters
+    ----------
+    request: request
+        The request that was made by the client
+    serializer_class: class
+        Class of the model serializer
+    obj_class: class
+        Class of the model
+    pk: int
+        Id of the requested object
+    partial_update: boolean
+        Boolean that indicates which type of request is being handled (PUT/PATCH)
+
+    Returns
+    -------
+    Response
+        Response object containing the serializer data
     """
     queryset = obj_class.objects.filter(is_active=True)
     obj = get_object_or_404(queryset, pk=pk)
@@ -78,10 +134,25 @@ def generic_rest_update_object(request, serializer_class, obj_class, pk, partial
 
 
 def generic_rest_soft_delete(request, serializer_class, obj_class, pk):
-    """
-    Function used by GenericViewSet:destroy to make a soft delete of the specified object.
+    """Function used by GenericViewSet:destroy to make a soft delete of the specified object.
     This means that the object is not truly deleted but its active state change to false.
     The object must be active to delete it.
+
+    Parameters
+    ----------
+    request: request
+        The request that was made by the client
+    serializer_class: class
+        Class of the model serializer
+    obj_class: class
+        Class of the model
+    pk: int
+        Id of the requested object
+
+    Returns
+    -------
+    Response
+        Response object containing the serializer data
     """
     queryset = obj_class.objects.filter(is_active=True)
     obj = get_object_or_404(queryset, pk=pk)
@@ -92,13 +163,14 @@ def generic_rest_soft_delete(request, serializer_class, obj_class, pk):
 
 
 class GenericViewSet(viewsets.ViewSet):
-    """
-    Generic view set for basic CRUD REST Service.
+    """Generic view set for basic CRUD REST Service.
+    To use it a ViewSet has to inherit from it and add the attributes.
 
-    To use it a ViewSet has to inherit from it and add the attributes:
-    obj_class: The model class
+    Attributes
+    ----------
+    obj_class: class
         Class of the main model that the REST is going to work on
-    serializer_class: The serializer class of the model
+    serializer_class: class
         Class of the serializer that is going to represent the obj_class
     """
 
@@ -127,34 +199,45 @@ class GenericViewSet(viewsets.ViewSet):
 
 
 class GenericAPITest(APITestCase):
-    """
-        Tests to verify the basic usage of the REST API to create, modify and list objects.
-        To use, a new class that inherits from utils.GenericAPITest has to be declared.
-        The setUp function and its attributes must be overriden:
-            -self.user: test user created on the DB for authentication
-            -self.obj_class: model class of the API REST that's being tested
-            -self.test_objects: array containing all the object_class objects
-                    created and saved in the test DB
-            -self.number_of_initial_objects: size of the test objects array->len(self.test_objects)
-            -self.data_creation_test: dictionary containing necessary data to create an object
-                    succesfuly
-            -self.data_edition_test: dictionary containing necessary data to edit an object
-                    succesfuly
-            -self.edition_obj_idx: index of the object in the array of objects
-                    that's going to be edited in the test with the data_edition_test dict.
-            -self.view: GenericViewSet that's being tested with a dict of http methods. Example:
-                    ObjectViewSet.as_view({
-                                'get': 'list',
-                                'post': 'create',
-                                'put': 'update',
-                                'patch': 'partial_update',
-                                'delete': 'destroy'
-                                })
-            -self.url_list: location of the viewset-list API without reversing it.
-                    Example: 'app:objects-list'
-            -self.url_detail: location of the viewset-detail API without reversing it.
-                    Example: 'app:objects-detail'
-            -self.factory: factory to construct requests, it must be always = APIRequestFactory()
+    """Tests to verify the basic usage of the REST API to create, modify and list objects.
+    To use, a new class that inherits from utils.GenericAPITest has to be declared.
+    The setUp function and its attributes must be overriden.
+
+    Setup attributes
+    ----------------
+    self.user: User model object
+        Test user created on the DB for authentication
+    self.obj_class: Model class
+        Model class of the API REST that's being tested
+    self.test_objects:
+        Array containing all the object_class objects created and saved in the test DB
+    self.number_of_initial_objects: int
+        Size of the test objects array->len(self.test_objects)
+    self.data_creation_test: dict
+        Dictionary containing necessary data to create an object succesfuly
+    self.data_edition_test: dict
+        Dictionary containing necessary data to edit an object succesfuly
+    self.edition_obj_idx: int
+        Index of the object in the array of objects that's going to be edited in the
+        test with the data_edition_test dict.
+    self.view: GenericViewSet
+        GenericViewSet that's being tested with a dict of http methods.
+        e.g:
+        ObjectViewSet.as_view({
+                    'get': 'list',
+                    'post': 'create',
+                    'put': 'update',
+                    'patch': 'partial_update',
+                    'delete': 'destroy'
+                    })
+    self.url_list: string
+        Location of the viewset-list API without reversing it.
+        e.g: 'app:objects-list'
+    self.url_detail: string
+        Location of the viewset-detail API without reversing it.
+        e.g: 'app:objects-detail'
+    self.factory: APIRequestFactory
+        Factory to construct requests, it must be always = APIRequestFactory()
     """
 
     def setUp(self):
@@ -170,9 +253,8 @@ class GenericAPITest(APITestCase):
         self.url_detail = ''
         self.factory = APIRequestFactory()
 
-    def test_contact_creation(self):
-        """
-            Test that an object instance can be generated through the REST API endpoint.
+    def test_object_creation(self):
+        """Test that an object instance can be generated through the REST API endpoint.
         """
         request = self.factory.post(reverse(self.url_list), data=self.data_creation_test)
         token = Token.objects.get(user=self.user)
@@ -188,9 +270,8 @@ class GenericAPITest(APITestCase):
                 self.assertEqual(self.data_creation_test[key], object_instance_dict[key])
         self.assertEqual(self.number_of_initial_objects + 1, self.obj_class.objects.all().count())
 
-    def test_multiple_contact_listing(self):
-        """
-            Tests that all class objects can be retrieved through the REST API endpoint.
+    def test_multiple_object_listing(self):
+        """Tests that all class objects can be retrieved through the REST API endpoint.
         """
         request = self.factory.get(reverse(self.url_list))
         token = Token.objects.get(user=self.user)
@@ -206,9 +287,8 @@ class GenericAPITest(APITestCase):
                 if key in object_instance_dict:
                     self.assertEqual(obj[key], object_instance_dict[key])
 
-    def test_empty_contact_creation(self):
-        """
-            Tests that an object can't be created without the required information.
+    def test_empty_object_creation(self):
+        """Tests that an object can't be created without the required information.
         """
         data = {}
         request = self.factory.post(reverse(self.url_list), data=data)
@@ -217,9 +297,8 @@ class GenericAPITest(APITestCase):
         response = self.view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_modify_contact(self):
-        """
-            Test that an object can be modified.
+    def test_modify_object(self):
+        """Test that an object can be modified.
         """
         edit_obj_instance = self.test_objects[self.edition_obj_idx]
         request = self.factory.put(reverse(self.url_detail,
