@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from clients.models import Client, Contact
+from .models import Client, Contact
 
 
 class ContactSerializer(serializers.ModelSerializer):
@@ -11,27 +11,21 @@ class ContactSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'last_name',
-            'phone',
+            'charge',
+            'landline',
+            'extension',
+            'mobile_phone_1',
+            'mobile_phone_2',
             'email',
             'alternate_email',
-            'alternate_phone',
+            'is_active',
             'client'
         )
-
-    def create(self, validated_data):
-        if 'id' in self.context['request'].data:
-            pk = self.context['request'].data['id']
-            Contact.objects.filter(id=pk).update(**validated_data)
-            contact = Contact.objects.get(id=pk)
-        else:
-            contact = Contact.objects.create(**validated_data)
-            contact.save()
-        return contact
 
 
 class ClientSerializer(serializers.ModelSerializer):
 
-    contacts = ContactSerializer(many=True)
+    contacts = ContactSerializer(many=True, read_only=True)
 
     class Meta:
         model = Client

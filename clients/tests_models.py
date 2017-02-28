@@ -23,23 +23,22 @@ class ContactTestCase(ClientTestCase):
         Contact.objects.create(
             name='Fernando',
             last_name='Lobato Meeser',
-            phone='4424674323',
+            charge='Project Owner',
+            landline='4424674323',
+            mobile_phone_1='2341631',
             email='lobato.meeser.fernando@hotmail.com',
             alternate_email='ferlobo93@hotmail.com',
-            alternate_phone='2341631',
             client=starbucks)
 
     def test_contact_name(self):
-        '''
-            Tests if the objects are being created in the database and their __str__ func works
-        '''
+        """Tests if the objects are being created in the database and their __str__ func works
+        """
         client_instance = Contact.objects.get(name='Fernando')
         self.assertEqual(str(client_instance), 'Fernando Lobato Meeser')
 
     def test_relation_contact(self):
-        '''
-            Test if the contact objects are correctly referecing their clients.
-        '''
+        """Test if the contact objects are correctly referecing their clients.
+        """
         client_instance = Contact.objects.get(name='Fernando')
         starbucks = Client.objects.get(name='Test Starbucks')
         self.assertEqual(client_instance.client, starbucks)
