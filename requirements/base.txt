@@ -26,3 +26,4 @@ Twisted==16.6.0
 txaio==2.6.0
 zope.interface==4.3.3
 pillow==4.0.0
+django-cors-headers==2.0.2
