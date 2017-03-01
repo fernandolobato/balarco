@@ -117,7 +117,8 @@ class Work(models.Model):
     contact = models.ForeignKey(Contact, related_name='works', on_delete=models.CASCADE)
     current_status = models.ForeignKey(Status, related_name='works', on_delete=models.CASCADE)
     work_type = models.ForeignKey(WorkType, related_name='works', on_delete=models.CASCADE)
-    iguala = models.ForeignKey(Iguala, related_name='works', on_delete=models.CASCADE, blank=True)
+    iguala = models.ForeignKey(Iguala, related_name='works', on_delete=models.CASCADE,
+                               blank=True, null=True)
 
     creation_date = models.DateField()
     name = models.CharField(max_length=100)
