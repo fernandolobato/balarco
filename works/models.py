@@ -15,6 +15,10 @@ class WorkType(models.Model):
         Name of the work type.
     """
     name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return '{}'.format(self.name)
 
 
 class ArtType(models.Model):
@@ -30,6 +34,10 @@ class ArtType(models.Model):
     work_type = models.ForeignKey(WorkType, related_name='art_types', on_delete=models.CASCADE)
 
     name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return '{}'.format(self.name)
 
 
 class Iguala(models.Model):
@@ -51,6 +59,10 @@ class Iguala(models.Model):
     name = models.CharField(max_length=100)
     start_date = models.DateField()
     end_date = models.DateField()
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return '{}'.format(self.name)
 
 
 class ArtIguala(models.Model):
@@ -69,6 +81,10 @@ class ArtIguala(models.Model):
     art_type = models.ForeignKey(ArtType, related_name='art_iguala', on_delete=models.CASCADE)
 
     quantity = models.IntegerField()
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return '{} - {} - {}'.format(self.iguala, self.art_type, self.quantity)
 
 
 class Status(models.Model):
@@ -98,6 +114,7 @@ class Status(models.Model):
         (STATUS_TERMINADO, 'Terminado'),
     )
     status_id = models.IntegerField(choices=STATUS)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.STATUS[self.status_id][1]
@@ -142,6 +159,10 @@ class Work(models.Model):
     expected_delivery_date = models.DateField()
     brief = models.TextField()
     final_link = models.CharField(max_length=1000, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return '{}'.format(self.name)
 
 
 class ArtWork(models.Model):
@@ -160,6 +181,10 @@ class ArtWork(models.Model):
     art_type = models.ForeignKey(ArtType, related_name='art_works', on_delete=models.CASCADE)
 
     quantity = models.IntegerField()
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return '{} - {} - {}'.format(self.work, self.art_type, self.quantity)
 
 
 class File(models.Model):
@@ -175,6 +200,7 @@ class File(models.Model):
     work = models.ForeignKey(Work, related_name='files', on_delete=models.CASCADE)
 
     upload = models.FileField(upload_to='work_files/')
+    is_active = models.BooleanField(default=True)
 
 
 class WorkDesigner(models.Model):
@@ -196,6 +222,10 @@ class WorkDesigner(models.Model):
 
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return '{} - {}'.format(self.designer, self.work)
 
 
 class StatusChange(models.Model):
@@ -210,5 +240,10 @@ class StatusChange(models.Model):
     """
     work = models.ForeignKey(Work, related_name='status_changes', on_delete=models.CASCADE)
     status = models.ForeignKey(Status, related_name='status_changes', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='status_changes', on_delete=models.CASCADE)
 
     date = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return '{} - {} - {}'.format(self.work, self.status, self.date)
