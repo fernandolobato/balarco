@@ -8,19 +8,6 @@ from rest_framework.test import APITestCase, APIRequestFactory, force_authentica
 from rest_framework.authtoken.models import Token
 
 
-STATUS = (
-    (0, 'Pendiente'),
-    (1, 'Diseño'),
-    (2, 'Cuentas'),
-    (3, 'Validación'),
-    (4, 'Producción'),
-    (5, 'Por cobrar'),
-    (6, 'Por facturar'),
-    (7, 'Pagado'),
-    (8, 'Terminado')
-)
-
-
 def generic_rest_list_objects(request, serializer_class, obj_class):
     """Function to list all objects of a model in GenericViewSet:list.
     It makes a Query to the specified object class geting all active objects

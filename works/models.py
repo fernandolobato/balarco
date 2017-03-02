@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from clients.models import Client, Contact
-from balarco import utils
 
 
 class WorkType(models.Model):
@@ -78,12 +77,30 @@ class Status(models.Model):
     Attributes:
     -----------
     status_id: IntegerField
-        Integer that indicates the status id of the utils.STATUS tuple.
+        Integer that indicates the status id of the STATUS tuple.
     """
-    status_id = models.IntegerField(choices=utils.STATUS)
+    STATUS_PENDIENTE = 0
+    STATUS_DISENO = 1
+    STATUS_CUENTAS = 2
+    STATUS_VALIDACION = 3
+    STATUS_PRODUCCION = 4
+    STATUS_POR_COBRAR = 5
+    STATUS_POR_FACTURAR = 6
+    STATUS_TERMINADO = 7
+    STATUS = (
+        (STATUS_PENDIENTE, 'Pendiente'),
+        (STATUS_DISENO, 'Diseño'),
+        (STATUS_CUENTAS, 'Cuentas'),
+        (STATUS_VALIDACION, 'Validación'),
+        (STATUS_PRODUCCION, 'Producción'),
+        (STATUS_POR_COBRAR, 'Por cobrar'),
+        (STATUS_POR_FACTURAR, 'Por facturar'),
+        (STATUS_TERMINADO, 'Terminado'),
+    )
+    status_id = models.IntegerField(choices=STATUS)
 
     def __str__(self):
-        return utils.STATUS[self.status_id][1]
+        return self.STATUS[self.status_id][1]
 
 
 class Work(models.Model):
