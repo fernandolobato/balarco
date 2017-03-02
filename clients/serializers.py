@@ -3,7 +3,16 @@ from rest_framework import serializers
 from .models import Client, Contact
 
 
+class ClientSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Client
+        fields = ('id', 'name', 'address',)
+
+
 class ContactSerializer(serializers.ModelSerializer):
+
+    client_complete = ClientSerializer(source='client', read_only=True)
 
     class Meta:
         model = Contact
@@ -19,14 +28,6 @@ class ContactSerializer(serializers.ModelSerializer):
             'email',
             'alternate_email',
             'is_active',
-            'client'
+            'client',
+            'client_complete'
         )
-
-
-class ClientSerializer(serializers.ModelSerializer):
-
-    contacts = ContactSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Client
-        fields = ('id', 'name', 'address', 'contacts')
