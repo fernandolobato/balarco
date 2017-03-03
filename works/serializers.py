@@ -10,7 +10,7 @@ class WorkTypeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'is_active')
 
 
-class ArtypeSerializer(serializers.ModelSerializer):
+class ArtTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ArtType
