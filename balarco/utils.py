@@ -288,7 +288,7 @@ class GenericAPITest(APITestCase):
         """Test that an object can be modified.
         """
         edit_obj_instance = self.test_objects[self.edition_obj_idx]
-        request = self.factory.put(reverse(self.url_detail,
+        request = self.factory.patch(reverse(self.url_detail,
                                            kwargs={'pk': edit_obj_instance.id}),
                                    data=self.data_edition_test)
         token = Token.objects.get(user=self.user)
