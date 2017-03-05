@@ -293,23 +293,11 @@ class WorkAPITest(utils.GenericAPITest):
             name='Iguala Starbucks',
             start_date=datetime.date.today(),
             end_date=datetime.date.today())
-        iguala_oxxo = models.Iguala.objects.create(
-            client=client_oxxo,
-            name='Iguala Oxxo',
-            start_date=datetime.date.today(),
-            end_date=datetime.date.today())
 
         work_type_graduacion = models.WorkType.objects.create(
             name='Graduación')
         work_type_iguala = models.WorkType.objects.create(
             name='Iguala')
-
-        art_type_arte_complejo = models.ArtType.objects.create(
-            name='Arte complejo',
-            work_type=work_type_iguala)
-        art_type_invitacion = models.ArtType.objects.create(
-            name='Invitación',
-            work_type=work_type_graduacion)
 
         status_pendiente = models.Status.objects.create(
             status_id=models.Status.STATUS_PENDIENTE)
