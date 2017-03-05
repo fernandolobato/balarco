@@ -254,7 +254,7 @@ class GenericAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         for key in self.data_creation_test.keys():
             if key in object_instance_dict:
-                self.assertEqual(self.data_creation_test[key], object_instance_dict[key])
+                self.assertEqual(str(self.data_creation_test[key]), str(object_instance_dict[key]))
         self.assertEqual(self.number_of_initial_objects + 1, self.obj_class.objects.all().count())
 
     def test_multiple_object_listing(self):
@@ -272,7 +272,7 @@ class GenericAPITest(APITestCase):
             object_instance_dict = model_to_dict(object_instance)
             for key in obj.keys():
                 if key in object_instance_dict:
-                    self.assertEqual(obj[key], object_instance_dict[key])
+                    self.assertEqual(str(obj[key]), str(object_instance_dict[key]))
 
     def test_empty_object_creation(self):
         """Tests that an object can't be created without the required information.
@@ -299,5 +299,5 @@ class GenericAPITest(APITestCase):
         object_instance_dict = model_to_dict(object_instance)
         for key in self.data_edition_test.keys():
             if key in object_instance_dict:
-                self.assertEqual(self.data_edition_test[key], object_instance_dict[key])
+                self.assertEqual(str(self.data_edition_test[key]), str(object_instance_dict[key]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
