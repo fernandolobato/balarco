@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -154,7 +156,7 @@ class Work(models.Model):
     iguala = models.ForeignKey(Iguala, related_name='works', on_delete=models.CASCADE,
                                blank=True, null=True)
 
-    creation_date = models.DateField()
+    creation_date = models.DateField(blank=True, null=True)
     name = models.CharField(max_length=100)
     expected_delivery_date = models.DateField()
     brief = models.TextField()
@@ -163,6 +165,11 @@ class Work(models.Model):
 
     def __str__(self):
         return '{}'.format(self.name)
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            self.creation_date = datetime.date.today()
+        super(Work, self).save(*args, **kwargs)
 
 
 class ArtWork(models.Model):
@@ -220,12 +227,20 @@ class WorkDesigner(models.Model):
     designer = models.ForeignKey(User, related_name='asigned_works', on_delete=models.CASCADE)
     work = models.ForeignKey(Work, related_name='work_designers', on_delete=models.CASCADE)
 
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    start_date = models.DateTimeField(blank=True, null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
+    active_work = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return '{} - {}'.format(self.designer, self.work)
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            self.start_date = datetime.datetime.now()
+        if not self.active_work:
+            self.end_date = datetime.datetime.now()
+        super(WorkDesigner, self).save(*args, **kwargs)
 
 
 class StatusChange(models.Model):
@@ -242,8 +257,12 @@ class StatusChange(models.Model):
     status = models.ForeignKey(Status, related_name='status_changes', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='status_changes', on_delete=models.CASCADE)
 
-    date = models.DateTimeField()
+    date = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return '{} - {} - {}'.format(self.work, self.status, self.date)
+
+    def save(self, *args, **kwargs):
+        self.date = datetime.datetime.now()
+        super(StatusChange, self).save(*args, **kwargs)
