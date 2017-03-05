@@ -251,7 +251,7 @@ class ArtIgualaAPITest(utils.GenericAPITest):
 
 
 class WorkAPITest(utils.GenericAPITest):
-    """Tests to verify the basic usage of the REST API to create, modify and list arts from an iguala.
+    """Tests to verify the basic usage of the REST API to create, modify and list arts from a work.
     It inherits from utils.GenericAPITest and add the necessary class attributes.
     """
     def setUp(self):
@@ -353,4 +353,130 @@ class WorkAPITest(utils.GenericAPITest):
 
         self.url_list = 'works:works-list'
         self.url_detail = 'works:works-detail'
+        self.factory = APIRequestFactory()
+
+
+class ArtWorkAPITest(utils.GenericAPITest):
+    """Tests to verify the basic usage of the REST API to create, modify and list arts from an iguala.
+    It inherits from utils.GenericAPITest and add the necessary class attributes.
+    """
+    def setUp(self):
+        self.user = User.objects.create_user(username='test_user',
+                                             password='test_password')
+        self.obj_class = models.ArtWork
+
+        client_starbucks = client_models.Client.objects.create(
+            name='Test Starbucks',
+            address='Felipe Ángeles 225',
+            is_active=True)
+        client_oxxo = client_models.Client.objects.create(
+            name='Test Oxxo',
+            address='Epigmenio González 100',
+            is_active=True)
+
+        contact_instance_julian = client_models.Contact.objects.create(
+            name='Julian',
+            last_name='Niebieskikiwat',
+            charge='Manager',
+            landline='4471172395',
+            mobile_phone_1='26416231',
+            email='julian@elguandul.com',
+            alternate_email='julio@hotmail.com',
+            client=client_starbucks,
+            is_active=True)
+        contact_instance_hector = client_models.Contact.objects.create(
+            name='Hector',
+            last_name='Sanchez',
+            charge='Developer',
+            landline='4426683012',
+            mobile_phone_1='5555555',
+            email='hector@eldominio.com',
+            client=client_oxxo,
+            is_active=True)
+
+        iguala_starbucks = models.Iguala.objects.create(
+            client=client_starbucks,
+            name='Iguala Starbucks',
+            start_date=datetime.date.today(),
+            end_date=datetime.date.today())
+
+        work_type_graduacion = models.WorkType.objects.create(
+            name='Graduación')
+        work_type_iguala = models.WorkType.objects.create(
+            name='Iguala')
+
+        art_type_arte_complejo = models.ArtType.objects.create(
+            name='Arte complejo',
+            work_type=work_type_iguala)
+        art_type_arte_abstracto = models.ArtType.objects.create(
+            name='Arte abstracto',
+            work_type=work_type_iguala)
+        art_type_invitacion = models.ArtType.objects.create(
+            name='Invitación',
+            work_type=work_type_graduacion)
+        art_type_menu = models.ArtType.objects.create(
+            name='Menú',
+            work_type=work_type_graduacion)
+
+        status_pendiente = models.Status.objects.create(
+            status_id=models.Status.STATUS_PENDIENTE)
+        status_diseno = models.Status.objects.create(
+            status_id=models.Status.STATUS_DISENO)
+
+        work_iguala_starbucks = models.Work.objects.create(
+            executive=self.user,
+            contact=contact_instance_julian,
+            current_status=status_diseno,
+            work_type=work_type_iguala,
+            iguala=iguala_starbucks,
+            name='Work iguala starbucks',
+            expected_delivery_date=datetime.date.today(),
+            brief='Brief1')
+        work_graduacion_oxxo = models.Work.objects.create(
+            executive=self.user,
+            contact=contact_instance_hector,
+            current_status=status_pendiente,
+            work_type=work_type_graduacion,
+            name='Work graduación oxxo',
+            expected_delivery_date=datetime.date.today(),
+            brief='Brief2')
+
+        art_work1 = models.ArtWork.objects.create(
+            work=work_iguala_starbucks,
+            art_type=art_type_arte_complejo,
+            quantity=50)
+        art_work2 = models.ArtWork.objects.create(
+            work=work_iguala_starbucks,
+            art_type=art_type_arte_abstracto,
+            quantity=65)
+        art_work3 = models.ArtWork.objects.create(
+            work=work_graduacion_oxxo,
+            art_type=art_type_invitacion,
+            quantity=300)
+
+        self.test_objects = [art_work1, art_work2, art_work3]
+        self.number_of_initial_objects = len(self.test_objects)
+
+        self.data_creation_test = {
+            'work': work_graduacion_oxxo.id,
+            'art_type': art_type_menu.id,
+            'quantity': 300
+            }
+
+        self.data_edition_test = {
+            'quantity': 300
+            }
+
+        self.edition_obj_idx = 1
+
+        self.view = views.ArtWorkViewSet.as_view({
+                                'get': 'list',
+                                'post': 'create',
+                                'put': 'update',
+                                'patch': 'partial_update',
+                                'delete': 'destroy'
+                                })
+
+        self.url_list = 'works:art_works-list'
+        self.url_detail = 'works:art_works-detail'
         self.factory = APIRequestFactory()
