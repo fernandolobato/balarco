@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 from clients.models import Client, Contact
+from balarco import utils
 
 
 class WorkType(models.Model):
@@ -106,6 +107,7 @@ class Status(models.Model):
     STATUS_POR_COBRAR = 5
     STATUS_POR_FACTURAR = 6
     STATUS_TERMINADO = 7
+    STATUS_CANCELADO = 8
     STATUS = (
         (STATUS_PENDIENTE, 'Pendiente'),
         (STATUS_DISENO, 'Diseño'),
@@ -115,6 +117,7 @@ class Status(models.Model):
         (STATUS_POR_COBRAR, 'Por cobrar'),
         (STATUS_POR_FACTURAR, 'Por facturar'),
         (STATUS_TERMINADO, 'Terminado'),
+        (STATUS_CANCELADO, 'Cancelado'),
     )
     status_id = models.IntegerField(choices=STATUS)
     is_active = models.BooleanField(default=True)
@@ -171,6 +174,19 @@ class Work(models.Model):
         if self.pk is None:
             self.creation_date = datetime.date.today()
         super(Work, self).save(*args, **kwargs)
+
+    def get_possible_status_changes(self, user):
+        possible_status_changes = set()
+
+        if self.current_status.status_id == Status.STATUS_PENDIENTE:
+            if user.groups.filter(name=utils.GROUP_DIR_CUENTAS).exists():
+                possible_status_changes.add(Status.STATUS_DISENO)
+                possible_status_changes.add(Status.STATUS_CANCELADO)
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO).exists():
+                possible_status_changes.add(Status.STATUS_DISENO)
+                possible_status_changes.add(Status.STATUS_CANCELADO)
+
+        return Status.objects.filter(status_id__in=possible_status_changes)
 
 
 class ArtWork(models.Model):
