@@ -67,7 +67,7 @@ class WorkDesignerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.WorkDesigner
-        fields = ('id', 'designer', 'work', 'start_date', 'end_date', 'is_active')
+        fields = ('id', 'designer', 'work', 'start_date', 'end_date', 'active_work', 'is_active')
 
 
 class StatusChangeSerializer(serializers.ModelSerializer):

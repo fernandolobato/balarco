@@ -3,6 +3,7 @@ from rest_framework.test import APIRequestFactory
 
 from .models import Client, Contact
 from .views import ContactViewSet, ClientViewSet
+from . import serializers
 from balarco import utils
 
 
@@ -15,6 +16,7 @@ class ContactTest(utils.GenericAPITest):
         self.user = User.objects.create_user(username='test_user',
                                              password='test_password')
         self.obj_class = Contact
+        self.serializer_class = serializers.ContactSerializer
 
         client_instance_starbucks = Client.objects.create(
             name='Test Starbucks',
@@ -94,6 +96,7 @@ class ClientTest(utils.GenericAPITest):
                                              password='test_password')
 
         self.obj_class = Client
+        self.serializer_class = serializers.ClientSerializer
 
         client_instance_starbucks = Client.objects.create(
             name='Test Starbucks',
