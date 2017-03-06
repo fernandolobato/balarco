@@ -719,8 +719,7 @@ class WorkDesignerAPITest(utils.GenericAPITest):
 
 
 class StatusChangeAPITest(utils.GenericAPITest):
-    """Tests to verify the basic usage of the REST API to create, modify and list work-designer
-    relation.
+    """Tests to verify the basic usage of the REST API to create, modify and list status changes.
     It inherits from utils.GenericAPITest and add the necessary class attributes.
     """
     def setUp(self):
