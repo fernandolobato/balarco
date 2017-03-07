@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+
 from rest_framework.test import APIRequestFactory
 
 from .models import Client, Contact
@@ -15,6 +17,10 @@ class ContactTest(utils.GenericAPITest):
         self.user = User.objects.create_user(username='test_user',
                                              password='test_password')
         self.obj_class = Contact
+
+        url = reverse('users:api_login')
+        data = {'username': 'test_user', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
 
         client_instance_starbucks = Client.objects.create(
             name='Test Starbucks',
@@ -94,6 +100,10 @@ class ClientTest(utils.GenericAPITest):
                                              password='test_password')
 
         self.obj_class = Client
+
+        url = reverse('users:api_login')
+        data = {'username': 'test_user', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
 
         client_instance_starbucks = Client.objects.create(
             name='Test Starbucks',
