@@ -185,6 +185,15 @@ class Work(models.Model):
             if user.groups.filter(name=utils.GROUP_EJECUTIVO).exists():
                 possible_status_changes.add(Status.STATUS_DISENO)
                 possible_status_changes.add(Status.STATUS_CANCELADO)
+        elif self.current_status.status_id == Status.STATUS_DISENO:
+            pass
+        else:
+            if user.groups.filter(name=utils.GROUP_DIR_CUENTAS).exists():
+                possible_status_changes.add(Status.STATUS_PENDIENTE)
+                possible_status_changes.add(Status.STATUS_DISENO)
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO).exists():
+                possible_status_changes.add(Status.STATUS_PENDIENTE)
+                possible_status_changes.add(Status.STATUS_DISENO)
 
         return Status.objects.filter(status_id__in=possible_status_changes)
 
