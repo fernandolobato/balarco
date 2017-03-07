@@ -27,7 +27,6 @@ class ContactSerializer(serializers.ModelSerializer):
             'mobile_phone_2',
             'email',
             'alternate_email',
-            'is_active',
             'client',
-            'client_complete'
+            'client_complete',
         )
