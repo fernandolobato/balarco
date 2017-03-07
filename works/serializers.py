@@ -33,6 +33,8 @@ class ArtIgualaSerializer(serializers.ModelSerializer):
 
 class WorkSerializer(serializers.ModelSerializer):
 
+    creation_date = serializers.DateField(read_only=True)
+
     class Meta:
         model = models.Work
         fields = ('id',
@@ -65,12 +67,17 @@ class FileSerializer(serializers.ModelSerializer):
 
 class WorkDesignerSerializer(serializers.ModelSerializer):
 
+    start_date = serializers.DateTimeField(read_only=True)
+    end_date = serializers.DateTimeField(read_only=True)
+
     class Meta:
         model = models.WorkDesigner
         fields = ('id', 'designer', 'work', 'start_date', 'end_date', 'active_work', 'is_active')
 
 
 class StatusChangeSerializer(serializers.ModelSerializer):
+
+    date = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = models.StatusChange
