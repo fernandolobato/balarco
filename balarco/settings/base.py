@@ -101,7 +101,7 @@ DJOSER = {
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
     'PASSWORD_VALIDATORS': [],
-    'SERIALIZERS': {},
+    'SERIALIZERS': { 'user_registration': 'users.serializers.UserSerializer' },
 }
 
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
