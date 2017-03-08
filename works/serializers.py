@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from . import models
 from clients import serializers as client_serializers
+from users import serializers as user_serializers
 
 
 class WorkTypeSerializer(serializers.ModelSerializer):
@@ -46,15 +47,25 @@ class StatusSerializer(serializers.ModelSerializer):
 class WorkSerializer(serializers.ModelSerializer):
 
     creation_date = serializers.DateField(read_only=True)
+    executive_complete = user_serializers.UserSerializer(source='executive', read_only=True)
+    contact_complete = client_serializers.ContactSerializer(source='contact', read_only=True)
+    current_status_complete = StatusSerializer(source='current_status', read_only=True)
+    work_type_complete = WorkTypeSerializer(source='work_type', read_only=True)
+    iguala_complete = IgualaSerializer(source='iguala', read_only=True)
 
     class Meta:
         model = models.Work
         fields = ('id',
                   'executive',
+                  'executive_complete',
                   'contact',
+                  'contact_complete',
                   'current_status',
+                  'current_status_complete',
                   'work_type',
+                  'work_type_complete',
                   'iguala',
+                  'iguala_complete',
                   'creation_date',
                   'name',
                   'expected_delivery_date',
