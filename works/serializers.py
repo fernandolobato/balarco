@@ -34,6 +34,15 @@ class ArtIgualaSerializer(serializers.ModelSerializer):
         fields = ('id', 'iguala', 'art_type', 'quantity',)
 
 
+class StatusSerializer(serializers.ModelSerializer):
+
+    name = serializers.CharField(source='__str__', read_only=True)
+
+    class Meta:
+        model = models.Status
+        fields = ('id', 'status_id', 'name',)
+
+
 class WorkSerializer(serializers.ModelSerializer):
 
     creation_date = serializers.DateField(read_only=True)
