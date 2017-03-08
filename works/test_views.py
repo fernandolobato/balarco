@@ -3,6 +3,7 @@ import datetime
 from django.contrib.auth.models import User
 from rest_framework.test import APIRequestFactory
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.urlresolvers import reverse
 
 from . import models, views, serializers
 from clients import models as client_models
@@ -16,6 +17,10 @@ class WorkTypeAPITest(utils.GenericAPITest):
     def setUp(self):
         self.user = User.objects.create_user(username='test_user',
                                              password='test_password')
+        url = reverse('users:api_login')
+        data = {'username': 'test_user', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
+
         self.obj_class = models.WorkType
         self.serializer_class = serializers.WorkTypeSerializer
 
@@ -59,6 +64,10 @@ class ArtTypeAPITest(utils.GenericAPITest):
     def setUp(self):
         self.user = User.objects.create_user(username='test_user',
                                              password='test_password')
+        url = reverse('users:api_login')
+        data = {'username': 'test_user', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
+
         self.obj_class = models.ArtType
         self.serializer_class = serializers.ArtTypeSerializer
 
@@ -114,6 +123,10 @@ class IgualaAPITest(utils.GenericAPITest):
     def setUp(self):
         self.user = User.objects.create_user(username='test_user',
                                              password='test_password')
+        url = reverse('users:api_login')
+        data = {'username': 'test_user', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
+
         self.obj_class = models.Iguala
         self.serializer_class = serializers.IgualaSerializer
 
@@ -178,6 +191,10 @@ class ArtIgualaAPITest(utils.GenericAPITest):
     def setUp(self):
         self.user = User.objects.create_user(username='test_user',
                                              password='test_password')
+        url = reverse('users:api_login')
+        data = {'username': 'test_user', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
+
         self.obj_class = models.ArtIguala
         self.serializer_class = serializers.ArtIgualaSerializer
 
@@ -261,6 +278,10 @@ class WorkAPITest(utils.GenericAPITest):
     def setUp(self):
         self.user = User.objects.create_user(username='test_user',
                                              password='test_password')
+        url = reverse('users:api_login')
+        data = {'username': 'test_user', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
+
         self.obj_class = models.Work
         self.serializer_class = serializers.WorkSerializer
 
@@ -368,6 +389,10 @@ class ArtWorkAPITest(utils.GenericAPITest):
     def setUp(self):
         self.user = User.objects.create_user(username='test_user',
                                              password='test_password')
+        url = reverse('users:api_login')
+        data = {'username': 'test_user', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
+
         self.obj_class = models.ArtWork
         self.serializer_class = serializers.ArtWorkSerializer
 
@@ -495,6 +520,10 @@ class FileAPITest(utils.GenericAPITest):
     def setUp(self):
         self.user = User.objects.create_user(username='test_user',
                                              password='test_password')
+        url = reverse('users:api_login')
+        data = {'username': 'test_user', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
+
         self.obj_class = models.File
         self.serializer_class = serializers.FileSerializer
 
@@ -609,6 +638,10 @@ class WorkDesignerAPITest(utils.GenericAPITest):
     def setUp(self):
         self.user = User.objects.create_user(username='test_user',
                                              password='test_password')
+        url = reverse('users:api_login')
+        data = {'username': 'test_user', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
+
         designer1 = User.objects.create_user(username='designer1',
                                              password='test_password')
         designer2 = User.objects.create_user(username='designer2',
@@ -725,6 +758,10 @@ class StatusChangeAPITest(utils.GenericAPITest):
     def setUp(self):
         self.user = User.objects.create_user(username='test_user',
                                              password='test_password')
+        url = reverse('users:api_login')
+        data = {'username': 'test_user', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
+
         designer1 = User.objects.create_user(username='designer1',
                                              password='test_password')
         designer2 = User.objects.create_user(username='designer2',

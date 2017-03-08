@@ -175,27 +175,99 @@ class Work(models.Model):
             self.creation_date = datetime.date.today()
         super(Work, self).save(*args, **kwargs)
 
-    def get_possible_status_changes(self, user):
-        possible_status_changes = set()
+    def get_possible_status_ids(self, user):
+        possible_status_ids = set()
+
+        if user is None:
+            return possible_status_ids
+        if self.pk is None:
+            return possible_status_ids
 
         if self.current_status.status_id == Status.STATUS_PENDIENTE:
             if user.groups.filter(name=utils.GROUP_DIR_CUENTAS).exists():
-                possible_status_changes.add(Status.STATUS_DISENO)
-                possible_status_changes.add(Status.STATUS_CANCELADO)
+                possible_status_ids.add(Status.STATUS_PENDIENTE)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
             if user.groups.filter(name=utils.GROUP_EJECUTIVO).exists():
-                possible_status_changes.add(Status.STATUS_DISENO)
-                possible_status_changes.add(Status.STATUS_CANCELADO)
+                possible_status_ids.add(Status.STATUS_PENDIENTE)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
         elif self.current_status.status_id == Status.STATUS_DISENO:
+            if user.groups.filter(name=utils.GROUP_DIR_ARTE):
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+
+            if user.groups.filter(name=utils.GROUP_DISENADOR_SR):
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+
+        elif self.current_status.status_id == Status.STATUS_CUENTAS:
+            if user.groups.filter(name=utils.GROUP_DIR_CUENTAS):
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_VALIDACION)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO):
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_VALIDACION)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+        elif self.current_status.status_id == Status.STATUS_VALIDACION:
+            if user.groups.filter(name=utils.GROUP_DIR_CUENTAS):
+                possible_status_ids.add(Status.STATUS_VALIDACION)
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_PRODUCCION)
+                possible_status_ids.add(Status.STATUS_POR_COBRAR)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO):
+                possible_status_ids.add(Status.STATUS_VALIDACION)
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_PRODUCCION)
+                possible_status_ids.add(Status.STATUS_POR_COBRAR)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+        elif self.current_status.status_id == Status.STATUS_PRODUCCION:
+            if user.groups.filter(name=utils.GROUP_DIR_CUENTAS):
+                possible_status_ids.add(Status.STATUS_PRODUCCION)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_POR_COBRAR)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO):
+                possible_status_ids.add(Status.STATUS_PRODUCCION)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_POR_COBRAR)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+        elif self.current_status.status_id == Status.STATUS_POR_COBRAR:
             pass
+
+        elif self.current_status.status_id == Status.STATUS_POR_FACTURAR:
+            pass
+
+        elif self.current_status.status_id == Status.STATUS_TERMINADO:
+            pass
+
         else:
             if user.groups.filter(name=utils.GROUP_DIR_CUENTAS).exists():
-                possible_status_changes.add(Status.STATUS_PENDIENTE)
-                possible_status_changes.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_PENDIENTE)
+                possible_status_ids.add(Status.STATUS_DISENO)
             if user.groups.filter(name=utils.GROUP_EJECUTIVO).exists():
-                possible_status_changes.add(Status.STATUS_PENDIENTE)
-                possible_status_changes.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_PENDIENTE)
+                possible_status_ids.add(Status.STATUS_DISENO)
 
-        return Status.objects.filter(status_id__in=possible_status_changes)
+        return possible_status_ids
+
+    def get_possible_status_changes(self, user):
+        possible_status_ids = self.get_possible_status_ids(user)
+        return Status.objects.filter(status_id__in=possible_status_ids)
 
 
 class ArtWork(models.Model):

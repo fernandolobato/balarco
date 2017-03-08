@@ -51,7 +51,7 @@ class WorkSerializer(serializers.ModelSerializer):
                   'expected_delivery_date',
                   'brief',
                   'final_link',
-                 )
+                  )
 
 
 class ArtWorkSerializer(serializers.ModelSerializer):

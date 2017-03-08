@@ -15,6 +15,7 @@ GROUP_DISENADOR_SR = "Diseñador SR"
 GROUP_DISENADOR_JR = "Diseñador JR"
 GROUP_SUPERUSUARIO = "Super usuario"
 
+
 def generic_rest_list_objects(request, serializer_class, obj_class):
     """Function to list all objects of a model in GenericViewSet:list.
     It makes a Query to the specified object class geting all active objects
