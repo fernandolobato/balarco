@@ -49,6 +49,7 @@ class WorkViewSet(utils.GenericViewSet):
         serializer = serializers.StatusSerializer(possible_status_changes, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
+
 class ArtWorkViewSet(utils.GenericViewSet):
     """ViewSet for ArtWork CRUD REST Service that inherits from utils.GenericViewSet
     """
