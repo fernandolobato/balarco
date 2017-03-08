@@ -9,17 +9,12 @@ class GroupSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.Serializer):
-    groups = GroupSerializer(many=True)
-    username = serializers.EmailField()
-    first_name = serializers.CharField(max_length=200)
-    last_name = serializers.CharField(max_length=200)
-    email = serializers.EmailField()
-    password = serializers.CharField(style={'input_type': 'password'})
-
-    class Meta:
-        model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'groups',)
-        extra_kwargs = {'password': {'write_only': True}}
+    groups = GroupSerializer(many=True, required=False)
+    username = serializers.EmailField(allow_blank=False)
+    first_name = serializers.CharField(max_length=200, allow_blank=False)
+    last_name = serializers.CharField(max_length=200, allow_blank=False)
+    email = serializers.EmailField(allow_blank=False)
+    password = serializers.CharField(style={'input_type': 'password'}, allow_blank=False)
 
     def create(self, validated_data):
         username = validated_data.get('username')
