@@ -2,6 +2,7 @@ import datetime
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from clients.models import Client, Contact
 
@@ -237,9 +238,9 @@ class WorkDesigner(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk is None:
-            self.start_date = datetime.datetime.now()
+            self.start_date = timezone.now()
         if not self.active_work:
-            self.end_date = datetime.datetime.now()
+            self.end_date = timezone.now()
         super(WorkDesigner, self).save(*args, **kwargs)
 
 
@@ -264,5 +265,5 @@ class StatusChange(models.Model):
         return '{} - {} - {}'.format(self.work, self.status, self.date)
 
     def save(self, *args, **kwargs):
-        self.date = datetime.datetime.now()
+        self.date = timezone.now()
         super(StatusChange, self).save(*args, **kwargs)
