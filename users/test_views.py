@@ -16,12 +16,16 @@ class TokenCreationTest(APITestCase):
             password='juliannieb')
 
     def test_return_authentication_token(self):
+        """Test that the API returns a valid token if credentials are correct.
+        """
         url = reverse('users:api_login')
         data = {'username': 'juliannieb', 'password': 'juliannieb'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_do_not_return_authentication_token(self):
+        """Test that the API doesn't return if credentials are incorrect.
+        """
         url = reverse('users:api_login')
         data = {'username': 'juliannieb', 'password': 'incorrect_password'}
         response = self.client.post(url, data, format='json')
@@ -40,6 +44,8 @@ class PasswordResetTest(APITestCase):
             password='juliannieb')
 
     def test_send_reset_email(self):
+        """Test that calling the resest password API returns a successful response.
+        """
         url = reverse('users:api_reset_password')
         data = {'email': 'marcolm485@gmail.com'}
         response = self.client.post(url, data, format='json')
