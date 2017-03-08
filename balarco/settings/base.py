@@ -95,9 +95,9 @@ REST_FRAMEWORK = {
 WSGI_APPLICATION = 'balarco.wsgi.application'
 
 DJOSER = {
-    'DOMAIN': 'balarco.com',
+    'DOMAIN': 'localhost:8000',
     'SITE_NAME': 'Balarco',
-    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'users/auth/password/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
     'PASSWORD_VALIDATORS': [],
