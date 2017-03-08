@@ -98,8 +98,9 @@ DJOSER = {
     'DOMAIN': 'localhost:8000',
     'SITE_NAME': 'Balarco',
     'PASSWORD_RESET_CONFIRM_URL': 'users/auth/password/reset/confirm/{uid}/{token}',
+    'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
-    'SEND_ACTIVATION_EMAIL': True,
+    'SEND_ACTIVATION_EMAIL': False,
     'PASSWORD_VALIDATORS': [],
     'SERIALIZERS': { 'user_registration': 'users.serializers.UserSerializer' },
 }

@@ -51,6 +51,14 @@ class PasswordResetTest(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    def test_do_not_send_reset_email(self):
+        """Test that calling the resest password API returns a failed response if mail doesn't exist.
+        """
+        url = reverse('users:api_reset_password')
+        data = {'email': 'does_not_exist@gmail.com'}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class UserRegistrationTest(APITestCase):
     def test_create_user(self):
