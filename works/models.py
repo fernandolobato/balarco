@@ -175,6 +175,10 @@ class Work(models.Model):
             self.creation_date = datetime.date.today()
         super(Work, self).save(*args, **kwargs)
 
+    @property
+    def group_name(self):
+        return 'work-{}'.format(self.id)
+
     def get_possible_status_ids(self, user):
         possible_status_ids = set()
 
