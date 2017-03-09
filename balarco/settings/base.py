@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'channels',
+    'djoser',
 ]
 
 MIDDLEWARE = [
@@ -94,6 +95,23 @@ REST_FRAMEWORK = {
 
 WSGI_APPLICATION = 'balarco.wsgi.application'
 
+DJOSER = {
+    'DOMAIN': 'localhost:8000',
+    'SITE_NAME': 'Balarco',
+    'PASSWORD_RESET_CONFIRM_URL': 'users/auth/password/reset/confirm/{uid}/{token}',
+    'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': False,
+    'PASSWORD_VALIDATORS': [],
+    'SERIALIZERS': { 'user_registration': 'users.serializers.UserSerializer' },
+}
+
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ['EMAIL_ADDRESS']
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_PASSWORD']
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases

@@ -1,3 +1,8 @@
+from rest_framework.decorators import detail_route
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework import status
+
 from . import models, serializers
 from balarco import utils
 
@@ -35,6 +40,14 @@ class WorkViewSet(utils.GenericViewSet):
     """
     obj_class = models.Work
     serializer_class = serializers.WorkSerializer
+
+    @detail_route(methods=['get'], url_path='possible-status-changes')
+    def possible_status_changes(self, request, pk=None):
+        queryset = models.Work.objects.filter(is_active=True)
+        work = get_object_or_404(queryset, pk=pk)
+        possible_status_changes = work.get_possible_status_changes(request.user)
+        serializer = serializers.StatusSerializer(possible_status_changes, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
 
 
 class ArtWorkViewSet(utils.GenericViewSet):
