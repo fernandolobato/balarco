@@ -1,9 +1,12 @@
 import datetime
+import json
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from channels import Group
 
+from users import models as user_models
 from clients.models import Client, Contact
 from balarco import utils
 
@@ -170,14 +173,32 @@ class Work(models.Model):
     def __str__(self):
         return '{}'.format(self.name)
 
+    def send_notification(self):
+        """
+        Sends a notification to everyone in our Liveblog's group with our
+        content.
+        """
+        # Make the payload of the notification. We'll JSONify this, so it has
+        # to be simple types, which is why we handle the datetime here.
+        notification = {
+            "id": self.id,
+            "name": self.name,
+        }
+        # Encode and send that message to the whole channels Group for our
+        # liveblog. Note how you can send to a channel or Group from any part
+        # of Django, not just inside a consumer.
+        users = user_models.User.objects.all()
+        for user in users:
+            print('user-{}'.format(user.id))
+            Group('user-{}'.format(user.id)).send({
+                "text": json.dumps(notification),
+                })
+
     def save(self, *args, **kwargs):
         if self.pk is None:
             self.creation_date = datetime.date.today()
+        self.send_notification()
         super(Work, self).save(*args, **kwargs)
-
-    @property
-    def group_name(self):
-        return 'work-{}'.format(self.id)
 
     def get_possible_status_ids(self, user):
         possible_status_ids = set()
