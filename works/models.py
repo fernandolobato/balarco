@@ -189,7 +189,6 @@ class Work(models.Model):
         # of Django, not just inside a consumer.
         users = user_models.User.objects.all()
         for user in users:
-            print('user-{}'.format(user.id))
             Group('user-{}'.format(user.id)).send({
                 "text": json.dumps(notification),
                 })
