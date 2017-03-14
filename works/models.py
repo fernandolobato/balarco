@@ -174,19 +174,13 @@ class Work(models.Model):
         return '{}'.format(self.name)
 
     def send_notification(self):
-        """
-        Sends a notification to everyone in our Liveblog's group with our
+        """Sends a notification to everyone in our Liveblog's group with our
         content.
         """
-        # Make the payload of the notification. We'll JSONify this, so it has
-        # to be simple types, which is why we handle the datetime here.
         notification = {
             "id": self.id,
             "name": self.name,
         }
-        # Encode and send that message to the whole channels Group for our
-        # liveblog. Note how you can send to a channel or Group from any part
-        # of Django, not just inside a consumer.
         users = user_models.User.objects.all()
         for user in users:
             Group('user-{}'.format(user.id)).send({
