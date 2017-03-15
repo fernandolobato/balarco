@@ -1,10 +1,14 @@
 import datetime
+import json
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from channels import Group
 
+from users import models as user_models
 from clients.models import Client, Contact
+from balarco import utils
 
 
 class WorkType(models.Model):
@@ -106,6 +110,7 @@ class Status(models.Model):
     STATUS_POR_COBRAR = 5
     STATUS_POR_FACTURAR = 6
     STATUS_TERMINADO = 7
+    STATUS_CANCELADO = 8
     STATUS = (
         (STATUS_PENDIENTE, 'Pendiente'),
         (STATUS_DISENO, 'Diseño'),
@@ -115,6 +120,7 @@ class Status(models.Model):
         (STATUS_POR_COBRAR, 'Por cobrar'),
         (STATUS_POR_FACTURAR, 'Por facturar'),
         (STATUS_TERMINADO, 'Terminado'),
+        (STATUS_CANCELADO, 'Cancelado'),
     )
     status_id = models.IntegerField(choices=STATUS)
     is_active = models.BooleanField(default=True)
@@ -149,6 +155,8 @@ class Work(models.Model):
     final_link: CharField
         Optional attribute that exists only when a designer finishes a work, it contains
         a url link to the location of the product.
+
+    @TODO: Confirm Status changes with client
     """
     executive = models.ForeignKey(User, related_name='managed_works', on_delete=models.CASCADE)
     contact = models.ForeignKey(Contact, related_name='works', on_delete=models.CASCADE)
@@ -167,10 +175,119 @@ class Work(models.Model):
     def __str__(self):
         return '{}'.format(self.name)
 
+    def send_notification(self):
+        """Sends a notification to everyone in our Liveblog's group with our
+        content.
+        """
+        notification = {
+            "id": self.id,
+            "name": self.name,
+        }
+        users = user_models.User.objects.all()
+        for user in users:
+            Group('user-{}'.format(user.id)).send({
+                "text": json.dumps(notification),
+                })
+
     def save(self, *args, **kwargs):
         if self.pk is None:
             self.creation_date = datetime.date.today()
+        self.send_notification()
         super(Work, self).save(*args, **kwargs)
+
+    def get_possible_status_ids(self, user):
+        possible_status_ids = set()
+
+        if user is None:
+            return possible_status_ids
+        if self.pk is None:
+            return possible_status_ids
+
+        if self.current_status.status_id == Status.STATUS_PENDIENTE:
+            if user.groups.filter(name=utils.GROUP_DIR_CUENTAS).exists():
+                possible_status_ids.add(Status.STATUS_PENDIENTE)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO).exists():
+                possible_status_ids.add(Status.STATUS_PENDIENTE)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+        elif self.current_status.status_id == Status.STATUS_DISENO:
+            if user.groups.filter(name=utils.GROUP_DIR_ARTE):
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+
+            if user.groups.filter(name=utils.GROUP_DISENADOR_SR):
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+
+        elif self.current_status.status_id == Status.STATUS_CUENTAS:
+            if user.groups.filter(name=utils.GROUP_DIR_CUENTAS):
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_VALIDACION)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO):
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_VALIDACION)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+        elif self.current_status.status_id == Status.STATUS_VALIDACION:
+            if user.groups.filter(name=utils.GROUP_DIR_CUENTAS):
+                possible_status_ids.add(Status.STATUS_VALIDACION)
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_PRODUCCION)
+                possible_status_ids.add(Status.STATUS_POR_COBRAR)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO):
+                possible_status_ids.add(Status.STATUS_VALIDACION)
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_PRODUCCION)
+                possible_status_ids.add(Status.STATUS_POR_COBRAR)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+        elif self.current_status.status_id == Status.STATUS_PRODUCCION:
+            if user.groups.filter(name=utils.GROUP_DIR_CUENTAS):
+                possible_status_ids.add(Status.STATUS_PRODUCCION)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_POR_COBRAR)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO):
+                possible_status_ids.add(Status.STATUS_PRODUCCION)
+                possible_status_ids.add(Status.STATUS_DISENO)
+                possible_status_ids.add(Status.STATUS_POR_COBRAR)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
+
+        elif self.current_status.status_id == Status.STATUS_POR_COBRAR:
+            pass
+
+        elif self.current_status.status_id == Status.STATUS_POR_FACTURAR:
+            pass
+
+        elif self.current_status.status_id == Status.STATUS_TERMINADO:
+            pass
+
+        else:
+            if user.groups.filter(name=utils.GROUP_DIR_CUENTAS).exists():
+                possible_status_ids.add(Status.STATUS_PENDIENTE)
+                possible_status_ids.add(Status.STATUS_DISENO)
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO).exists():
+                possible_status_ids.add(Status.STATUS_PENDIENTE)
+                possible_status_ids.add(Status.STATUS_DISENO)
+
+        return possible_status_ids
+
+    def get_possible_status_changes(self, user):
+        possible_status_ids = self.get_possible_status_ids(user)
+        return Status.objects.filter(status_id__in=possible_status_ids)
 
 
 class ArtWork(models.Model):
