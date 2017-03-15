@@ -1,4 +1,4 @@
-# jp2_online
+# balarco
 How to use the template
 
 ## System Requirements
@@ -19,10 +19,10 @@ $ psql
 
 Next, we will create a database and an admin user for our project. Later on we will use this information to setup the database on our project and to activate it through our virtual environments.
 ```sql
-CREATE DATABASE project_name_db;
-CREATE ROLE project_db_admin WITH LOGIN PASSWORD 'db_admin_password';
-GRANT ALL PRIVILEGES ON DATABASE project_name_db TO project_db_admin;
-ALTER USER project_db_admin CREATEDB;
+CREATE DATABASE balarco;
+CREATE ROLE balarco_admin WITH LOGIN PASSWORD 'db_admin_password';
+GRANT ALL PRIVILEGES ON DATABASE balarco TO balarco_admin;
+ALTER USER balarco_admin CREATEDB;
 ```
 
 
@@ -48,7 +48,7 @@ We use environment variables to separate sensitive information and keys from the
 
 
 ```bash
-DJANGO_SETTINGS_MODULE='jp2_online.settings.development' // The last part depends on the environment you are on
+DJANGO_SETTINGS_MODULE='balarco.settings.development' // The last part depends on the environment you are on
 SECRET_KEY='Generate one here. (http://www.miniwebtool.com/django-secret-key-generator/)'
 DB_NAME='project_name_db' // From Database Setup
 DB_USER='project_user_admin'
