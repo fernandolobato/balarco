@@ -30,6 +30,14 @@ install:
   - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install $TRAVIS_NODE_VERSION
   - npm install
   - npm install -g csslint
+  - sudo apt-get update
+  - sudo apt-get install build-essential
+  - sudo apt-get install tcl8.5
+  - wget http://download.redis.io/releases/redis-stable.tar.gz
+  - tar xvzf redis-stable.tar.gz
+  - cd redis-stable
+  - make
+  - cd ..
 
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
@@ -38,6 +46,7 @@ before_script:
   - sleep 3 # give xvfb some time to start
   - flake8
   - python manage.py migrate
+  - redis-server &
   - python manage.py runserver &
 
 script:
