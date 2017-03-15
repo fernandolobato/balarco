@@ -37,6 +37,7 @@ install:
   - tar xvzf redis-stable.tar.gz
   - cd redis-stable
   - make
+  - cd ..
 
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
