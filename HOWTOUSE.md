@@ -1,4 +1,4 @@
-# balarco
+# jp2_online
 How to use the template
 
 ## System Requirements
@@ -19,14 +19,16 @@ $ psql
 
 Next, we will create a database and an admin user for our project. Later on we will use this information to setup the database on our project and to activate it through our virtual environments.
 ```sql
-CREATE DATABASE balarco;
-CREATE ROLE balarco_admin WITH LOGIN PASSWORD 'db_admin_password';
-GRANT ALL PRIVILEGES ON DATABASE balarco TO balarco_admin;
-ALTER USER balarco_admin CREATEDB;
+CREATE DATABASE project_name_db;
+CREATE ROLE project_db_admin WITH LOGIN PASSWORD 'db_admin_password';
+GRANT ALL PRIVILEGES ON DATABASE project_name_db TO project_db_admin;
+ALTER USER project_db_admin CREATEDB;
 ```
 
 
 ## Virtual Environments
+
+### Virtualenv
 
 You will need to create a virtual environment in order to isolate all the packages that are required for the project. We provide instructions on how to do it with [`virtualenv`](https://virtualenv.pypa.io/en/stable/)
 
@@ -44,8 +46,9 @@ $ virtualenv --python='PATH TO PYTHON 3.5' /path/to/your/venv/NAME_OF_YOUR_ENV
 
 We use environment variables to separate sensitive information and keys from the code, you should set the following ones.
 
+
 ```bash
-DJANGO_SETTINGS_MODULE='balarco.settings.development' // The last part depends on the environment you are on
+DJANGO_SETTINGS_MODULE='jp2_online.settings.development' // The last part depends on the environment you are on
 SECRET_KEY='Generate one here. (http://www.miniwebtool.com/django-secret-key-generator/)'
 DB_NAME='project_name_db' // From Database Setup
 DB_USER='project_user_admin'
@@ -82,6 +85,40 @@ $ source /path/to/your/venv/NAME_OF_YOUR_ENV/bin/activate
 And deactivate it just by running this command on the terminal
 ```bash
 $ deactivate
+```
+
+
+### (Ana)Conda
+
+If you prefer, you can create a virtual environment using conda.
+
+Create the environment as follows:
+
+```bash
+$ conda install --name [the name of the environment] python=3.5
+```
+
+Afterwards, setup the scripts for activating the environment variables, and unsetting them when we activate and deactivate the virtual environment. To do it, first locate the directory of your environment which will be something like ```/anaconda/envs/[name_environment]``` (depends on your installation) and create the following subdirectories:
+
+```bash
+cd /anaconda/envs/[name_environment]
+mkdir -p ./etc/conda/activate.d
+mkdir -p ./etc/conda/deactivate.d
+touch ./etc/conda/activate.d/env_vars.sh
+touch ./etc/conda/deactivate.d/env_vars.sh
+```
+
+Then, modify ```activate.d/env_vars.sh``` to set the necessary environment variables, and ```deactivate.d/env_vars.sh``` to unset them (refer to the [virtualenv section](#virtualenv) to check which variables to set). These two scripts will be executed each time you activate and deactivate your environment.
+
+
+Finally, you can activate the environment by running
+```bash
+$ source activate [environment_name]
+```
+
+And deactivate it by running
+```bash
+$ source deactivate
 ```
 
 ## Installing the Project Requirements
