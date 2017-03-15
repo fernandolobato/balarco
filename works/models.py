@@ -155,6 +155,8 @@ class Work(models.Model):
     final_link: CharField
         Optional attribute that exists only when a designer finishes a work, it contains
         a url link to the location of the product.
+
+    @TODO: Confirm Status changes with client
     """
     executive = models.ForeignKey(User, related_name='managed_works', on_delete=models.CASCADE)
     contact = models.ForeignKey(Contact, related_name='works', on_delete=models.CASCADE)

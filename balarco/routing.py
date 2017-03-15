@@ -10,6 +10,7 @@ from works.consumers import connect_work, disconnect_work
 
 
 channel_routing = [
+    # @TODO: Correct urls
     # Called when incoming WebSockets connect
     route("websocket.connect", connect_work, path=r'^/works/works/(?P<pk>[^/]+)/stream/$'),
 
