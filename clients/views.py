@@ -10,8 +10,6 @@ class ContactViewSet(utils.GenericViewSet):
     obj_class = Contact
     queryset = Contact.objects.filter(is_active=True)
     serializer_class = ContactSerializer
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filter_fields = ('id', 'name')
 
 
 class ClientViewSet(utils.GenericViewSet):
