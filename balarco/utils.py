@@ -188,8 +188,8 @@ class GenericAPITest(APITestCase):
         """
         edit_obj_instance = self.test_objects[self.edition_obj_idx]
         request = self.factory.delete(reverse(self.url_detail,
-                                             kwargs={'pk': edit_obj_instance.id}),
-                                     data=self.data_edition_test)
+                                              kwargs={'pk': edit_obj_instance.id}),
+                                      data=self.data_edition_test)
         token = Token.objects.get(user=self.user)
         force_authenticate(request, user=self.user, token=token)
         response = self.view(request, pk=edit_obj_instance.id)

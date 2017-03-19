@@ -1,7 +1,6 @@
 from .models import Client, Contact
 from .serializers import ClientSerializer, ContactSerializer
 from balarco import utils
-import django_filters.rest_framework
 
 
 class ContactViewSet(utils.GenericViewSet):
