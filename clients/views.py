@@ -1,19 +1,18 @@
 from .models import Client, Contact
 from .serializers import ClientSerializer, ContactSerializer
 from balarco import utils
+from rest_framework import viewsets
 
 
-class ContactViewSet(utils.GenericViewSet):
+class ContactViewSet(viewsets.ModelViewSet):
+    """ViewSet for Contact CRUD REST Service that inherits from viewsets.ModelViewSet
     """
-    ViewSet for Contact CRUD REST Service that inherits from utils.GenericViewSet
-    """
-    obj_class = Contact
+    queryset = Contact.objects.filter(is_active=True)
     serializer_class = ContactSerializer
 
 
-class ClientViewSet(utils.GenericViewSet):
+class ClientViewSet(viewsets.ModelViewSet):
+    """ViewSet for Client CRUD REST Service that inherits from viewsets.ModelViewSet
     """
-    ViewSet for Client CRUD REST Service that inherits from utils.GenericViewSet
-    """
-    obj_class = Client
+    queryset = Client.objects.filter(is_active=True)
     serializer_class = ClientSerializer
