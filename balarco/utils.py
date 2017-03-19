@@ -182,3 +182,24 @@ class GenericAPITest(APITestCase):
             if key in serialized_object:
                 self.assertEqual(str(self.data_edition_test[key]), str(serialized_object[key]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_delete_object(self):
+        """Test that an object can be deleted.
+        """
+        edit_obj_instance = self.test_objects[self.edition_obj_idx]
+        request = self.factory.delete(reverse(self.url_detail,
+                                             kwargs={'pk': edit_obj_instance.id}),
+                                     data=self.data_edition_test)
+        token = Token.objects.get(user=self.user)
+        force_authenticate(request, user=self.user, token=token)
+        response = self.view(request, pk=edit_obj_instance.id)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        request = self.factory.get(reverse(self.url_list))
+        token = Token.objects.get(user=self.user)
+        force_authenticate(request, user=self.user, token=token)
+        response = self.view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.number_of_initial_objects - 1, len(response.data))
