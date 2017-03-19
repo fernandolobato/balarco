@@ -1,18 +1,22 @@
 from .models import Client, Contact
 from .serializers import ClientSerializer, ContactSerializer
 from balarco import utils
-from rest_framework import viewsets
+import django_filters.rest_framework
 
 
-class ContactViewSet(viewsets.ModelViewSet):
-    """ViewSet for Contact CRUD REST Service that inherits from viewsets.ModelViewSet
+class ContactViewSet(utils.GenericViewSet):
+    """ViewSet for Contact CRUD REST Service that inherits from utils.GenericViewSet
     """
+    obj_class = Contact
     queryset = Contact.objects.filter(is_active=True)
     serializer_class = ContactSerializer
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_fields = ('id', 'name')
 
 
-class ClientViewSet(viewsets.ModelViewSet):
-    """ViewSet for Client CRUD REST Service that inherits from viewsets.ModelViewSet
+class ClientViewSet(utils.GenericViewSet):
+    """ViewSet for Client CRUD REST Service that inherits from utils.GenericViewSet
     """
+    obj_class = Client
     queryset = Client.objects.filter(is_active=True)
     serializer_class = ClientSerializer

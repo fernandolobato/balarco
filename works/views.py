@@ -2,43 +2,47 @@ from rest_framework.decorators import detail_route
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import viewsets
 
 from . import models, serializers
 from balarco import utils
 
 
-class WorkTypeViewSet(viewsets.ModelViewSet):
-    """ViewSet for WorkType CRUD REST Service that inherits from viewsets.ModelViewSet
+class WorkTypeViewSet(utils.GenericViewSet):
+    """ViewSet for WorkType CRUD REST Service that inherits from utils.GenericViewSet
     """
+    obj_class = models.WorkType
     queryset = models.WorkType.objects.filter(is_active=True)
     serializer_class = serializers.WorkTypeSerializer
 
 
-class ArtTypeViewSet(viewsets.ModelViewSet):
-    """ViewSet for ArtType CRUD REST Service that inherits from viewsets.ModelViewSet
+class ArtTypeViewSet(utils.GenericViewSet):
+    """ViewSet for ArtType CRUD REST Service that inherits from utils.GenericViewSet
     """
+    obj_class = models.ArtType
     queryset = models.ArtType.objects.filter(is_active=True)
     serializer_class = serializers.ArtTypeSerializer
 
 
-class IgualaViewSet(viewsets.ModelViewSet):
-    """ViewSet for Iguala CRUD REST Service that inherits from viewsets.ModelViewSet
+class IgualaViewSet(utils.GenericViewSet):
+    """ViewSet for Iguala CRUD REST Service that inherits from utils.GenericViewSet
     """
+    obj_class = models.Iguala
     queryset = models.Iguala.objects.filter(is_active=True)
     serializer_class = serializers.IgualaSerializer
 
 
-class ArtIgualaViewSet(viewsets.ModelViewSet):
-    """ViewSet for ArtIguala CRUD REST Service that inherits from viewsets.ModelViewSet
+class ArtIgualaViewSet(utils.GenericViewSet):
+    """ViewSet for ArtIguala CRUD REST Service that inherits from utils.GenericViewSet
     """
+    obj_class = models.ArtIguala
     queryset = models.ArtIguala.objects.filter(is_active=True)
     serializer_class = serializers.ArtIgualaSerializer
 
 
-class WorkViewSet(viewsets.ModelViewSet):
-    """ViewSet for Work CRUD REST Service that inherits from viewsets.ModelViewSet
+class WorkViewSet(utils.GenericViewSet):
+    """ViewSet for Work CRUD REST Service that inherits from utils.GenericViewSet
     """
+    obj_class = models.Work
     queryset = models.Work.objects.filter(is_active=True)
     serializer_class = serializers.WorkSerializer
 
@@ -51,29 +55,33 @@ class WorkViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status.HTTP_200_OK)
 
 
-class ArtWorkViewSet(viewsets.ModelViewSet):
-    """ViewSet for ArtWork CRUD REST Service that inherits from viewsets.ModelViewSet
+class ArtWorkViewSet(utils.GenericViewSet):
+    """ViewSet for ArtWork CRUD REST Service that inherits from utils.GenericViewSet
     """
+    obj_class = models.ArtWork
     queryset = models.ArtWork.objects.filter(is_active=True)
     serializer_class = serializers.ArtWorkSerializer
 
 
-class FileViewSet(viewsets.ModelViewSet):
-    """ViewSet for File CRUD REST Service that inherits from viewsets.ModelViewSet
+class FileViewSet(utils.GenericViewSet):
+    """ViewSet for File CRUD REST Service that inherits from utils.GenericViewSet
     """
+    obj_class = models.File
     queryset = models.File.objects.filter(is_active=True)
     serializer_class = serializers.FileSerializer
 
 
-class WorkDesignerViewSet(viewsets.ModelViewSet):
-    """ViewSet for WorkDesigner CRUD REST Service that inherits from viewsets.ModelViewSet
+class WorkDesignerViewSet(utils.GenericViewSet):
+    """ViewSet for WorkDesigner CRUD REST Service that inherits from utils.GenericViewSet
     """
+    obj_class = models.WorkDesigner
     queryset = models.WorkDesigner.objects.filter(is_active=True)
     serializer_class = serializers.WorkDesignerSerializer
 
 
-class StatusChangeViewSet(viewsets.ModelViewSet):
-    """ViewSet for StatusChange CRUD REST Service that inherits from viewsets.ModelViewSet
+class StatusChangeViewSet(utils.GenericViewSet):
+    """ViewSet for StatusChange CRUD REST Service that inherits from utils.GenericViewSet
     """
+    obj_class = models.StatusChange
     queryset = models.StatusChange.objects.filter(is_active=True)
     serializer_class = serializers.StatusChangeSerializer

@@ -45,6 +45,26 @@ def generic_rest_soft_delete(request, serializer_class, obj_class, pk):
     return Response(serializer.data, status.HTTP_200_OK)
 
 
+class GenericViewSet(viewsets.ModelViewSet):
+    """Generic view set for basic CRUD REST Service.
+    To use it a ViewSet has to inherit from it and add the attributes.
+
+    Attributes
+    ----------
+    obj_class: class
+        Class of the main model that the REST is going to work on
+    serializer_class: class
+        Class of the serializer that is going to represent the obj_class
+    """
+
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    obj_class = None
+    serializer_class = None
+
+    def destroy(self, request, pk=None):
+        return generic_rest_soft_delete(request, self.serializer_class, self.obj_class, pk)
+
+
 class GenericAPITest(APITestCase):
     """Tests to verify the basic usage of the REST API to create, modify and list objects.
     To use, a new class that inherits from utils.GenericAPITest has to be declared.
