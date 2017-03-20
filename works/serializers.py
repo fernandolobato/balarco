@@ -19,20 +19,22 @@ class ArtTypeSerializer(serializers.ModelSerializer):
         fields = ('id', 'work_type', 'name',)
 
 
-class IgualaSerializer(serializers.ModelSerializer):
-
-    client_complete = client_serializers.ClientSerializer(source='client', read_only=True)
-
-    class Meta:
-        model = models.Iguala
-        fields = ('id', 'client', 'client_complete', 'name', 'start_date', 'end_date',)
-
-
 class ArtIgualaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ArtIguala
         fields = ('id', 'iguala', 'art_type', 'quantity',)
+
+
+class IgualaSerializer(serializers.ModelSerializer):
+
+    client_complete = client_serializers.ClientSerializer(source='client', read_only=True)
+    art_iguala = ArtIgualaSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.Iguala
+        fields = ('id', 'client', 'client_complete', 'name', 'start_date', 'end_date',
+                  'art_iguala',)
 
 
 class StatusSerializer(serializers.ModelSerializer):

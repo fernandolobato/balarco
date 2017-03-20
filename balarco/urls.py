@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^api/clients/', include('clients.urls')),
     url(r'^api/users/', include('users.urls', namespace='users')),
     url(r'^api/works/', include('works.urls', namespace='works')),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

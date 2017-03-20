@@ -152,6 +152,27 @@ class IgualaAPITest(utils.GenericAPITest):
             start_date=datetime.date.today(),
             end_date=datetime.date.today())
 
+        work_type_iguala = models.WorkType.objects.create(
+            name='Iguala')
+
+        art_type_arte_complejo = models.ArtType.objects.create(
+            name='Arte complejo',
+            work_type=work_type_iguala)
+
+        art_type_arte_abstracto = models.ArtType.objects.create(
+            name='Arte abstracto',
+            work_type=work_type_iguala)
+
+        art_iguala1 = {
+            'art_type': art_type_arte_complejo.id,
+            'quantity': 50
+        }
+
+        art_iguala2 = {
+            'art_type': art_type_arte_abstracto.id,
+            'quantity': 80
+        }
+
         self.test_objects = [iguala_starbucks, iguala_oxxo]
         self.number_of_initial_objects = len(self.test_objects)
 
@@ -159,7 +180,8 @@ class IgualaAPITest(utils.GenericAPITest):
             'client': client_oxxo.id,
             'name': 'Iguala Oxxo 2',
             'start_date': datetime.date.today(),
-            'end_date': datetime.date.today()
+            'end_date': datetime.date.today(),
+            'art_iguala': [art_iguala1, art_iguala2]
             }
 
         self.data_edition_test = {
