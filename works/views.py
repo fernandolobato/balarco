@@ -39,11 +39,7 @@ class IgualaViewSet(utils.GenericViewSet):
                 art_iguala['iguala'] = new_obj.id
                 serializer_art_iguala = serializers.ArtIgualaSerializer(data=art_iguala)
                 if serializer_art_iguala.is_valid():
-                    art_type = models.ArtType.objects.get(pk=art_iguala['art_type'])
-                    quantity = art_iguala['quantity']
-                    models.ArtIguala.objects.create(iguala=new_obj,
-                                                    art_type=art_type,
-                                                    quantity=quantity)
+                    models.ArtIguala.objects.create(**serializer_art_iguala.validated_data)
                 else:
                     query_art_iguala = models.ArtIguala.objects.filter(iguala=new_obj)
                     for art_iguala in query_art_iguala:
@@ -54,7 +50,6 @@ class IgualaViewSet(utils.GenericViewSet):
                         'message': '%s could not be created with received data.' %
                                    self.obj_class.__name__
                     }, status=status.HTTP_400_BAD_REQUEST)
-            # print(self.serializer_class(new_obj).data)
             return Response(self.serializer_class(new_obj).data, status=status.HTTP_201_CREATED)
         return Response({
             'status': 'Bad request',
