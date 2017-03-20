@@ -36,6 +36,7 @@ class IgualaViewSet(utils.GenericViewSet):
             new_obj = self.obj_class.objects.create(**serializer.validated_data)
             art_igualas = request.data['art_iguala']
             for art_iguala in art_igualas:
+                art_iguala['iguala'] = new_obj.id
                 serializer_art_iguala = serializers.ArtIgualaSerializer(data=art_iguala)
                 if serializer_art_iguala.is_valid():
                     art_type = models.ArtType.objects.get(pk=art_iguala['art_type'])

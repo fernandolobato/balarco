@@ -23,7 +23,7 @@ class ArtIgualaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ArtIguala
-        fields = ('id', 'art_type', 'quantity',)
+        fields = ('id', 'iguala', 'art_type', 'quantity',)
 
 
 class IgualaSerializer(serializers.ModelSerializer):
