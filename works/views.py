@@ -31,6 +31,10 @@ class IgualaViewSet(utils.GenericViewSet):
     serializer_class = serializers.IgualaSerializer
 
     def create(self, request):
+        """Overrided method because an Iguala has a list of Art types associated.
+        All objects are sended directly in the same WS and here are processed.
+        A roll back is done in case of failure so it's an atomic function
+        """
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             new_obj = self.obj_class.objects.create(**serializer.validated_data)
