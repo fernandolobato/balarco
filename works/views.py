@@ -70,6 +70,7 @@ class IgualaViewSet(utils.GenericViewSet):
                 return Response(self.serializer_class(updated_obj).data, status.HTTP_200_OK)
             art_igualas = request.data['art_iguala']
             for art_iguala in art_igualas:
+                art_iguala['iguala'] = updated_obj.id
                 art_type_id = art_iguala['art_type']
                 update_art_iguala_obj = models.ArtIguala.objects.get(iguala=updated_obj.id, 
                                                                      art_type=art_type_id)
