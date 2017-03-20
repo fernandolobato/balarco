@@ -16,118 +16,6 @@ GROUP_DISENADOR_JR = "Diseñador JR"
 GROUP_SUPERUSUARIO = "Super usuario"
 
 
-def generic_rest_list_objects(request, serializer_class, obj_class):
-    """Function to list all objects of a model in GenericViewSet:list.
-    It makes a Query to the specified object class geting all active objects
-
-    Parameters
-    ----------
-    request: request
-        The request that was made by the client
-    serializer_class: class
-        Class of the model serializer
-    obj_class: class
-        Class of the model
-
-    Returns
-    -------
-    Response
-        Response object containing the serializer data
-    """
-    queryset = obj_class.objects.filter(is_active=True)
-    serializer = serializer_class(queryset, many=True)
-    return Response(serializer.data, status.HTTP_200_OK)
-
-
-def generic_rest_create_object(request, serializer_class, obj_class):
-    """Function used in GenericViewSet:create to create and save a
-    new object of the specified class.
-
-    Parameters
-    ----------
-    request: request
-        The request that was made by the client
-    serializer_class: class
-        Class of the model serializer
-    obj_class: class
-        Class of the model
-
-    Returns
-    -------
-    Response
-        Response object containing the serializer data
-    """
-    serializer = serializer_class(data=request.data)
-    if serializer.is_valid():
-        new_obj = obj_class.objects.create(**serializer.validated_data)
-        return Response(serializer_class(new_obj).data, status=status.HTTP_201_CREATED)
-    return Response({
-        'status': 'Bad request',
-        'message': '%s could not be created with received data.' % obj_class.__name__
-    }, status=status.HTTP_400_BAD_REQUEST)
-
-
-def generic_rest_retrieve_object(request, serializer_class, obj_class, pk):
-    """Function used by GenericViewSet:retrieve to retrieve the data of specified object.
-    The object must be active to get it.
-
-    Parameters
-    ----------
-    request: request
-        The request that was made by the client
-    serializer_class: class
-        Class of the model serializer
-    obj_class: class
-        Class of the model
-    pk: int
-        Id of the requested object
-
-    Returns
-    -------
-    Response
-        Response object containing the serializer data
-    """
-    queryset = obj_class.objects.filter(is_active=True)
-    obj = get_object_or_404(queryset, pk=pk)
-    serializer = serializer_class(obj)
-    return Response(serializer.data, status.HTTP_200_OK)
-
-
-def generic_rest_update_object(request, serializer_class, obj_class, pk, partial_update):
-    """Function used by GenericViewSet:update and GenericViewSet:partial_update to edit
-    the data of the specified object.
-    The object must be active to edit it.
-
-    Parameters
-    ----------
-    request: request
-        The request that was made by the client
-    serializer_class: class
-        Class of the model serializer
-    obj_class: class
-        Class of the model
-    pk: int
-        Id of the requested object
-    partial_update: boolean
-        Boolean that indicates which type of request is being handled (PUT/PATCH)
-
-    Returns
-    -------
-    Response
-        Response object containing the serializer data
-    """
-    queryset = obj_class.objects.filter(is_active=True)
-    obj = get_object_or_404(queryset, pk=pk)
-    serializer = serializer_class(obj, data=request.data, partial=partial_update)
-    if serializer.is_valid():
-        updated_obj = serializer.save()
-        return Response(serializer_class(updated_obj).data, status.HTTP_200_OK)
-    return Response({
-        'status': 'Bad request',
-        'message': '%s could not be updated with received data.' % obj_class.__name__
-    }, status=status.HTTP_400_BAD_REQUEST)
-
-
 def generic_rest_soft_delete(request, serializer_class, obj_class, pk):
     """Function used by GenericViewSet:destroy to make a soft delete of the specified object.
     This means that the object is not truly deleted but its active state change to false.
@@ -157,7 +45,7 @@ def generic_rest_soft_delete(request, serializer_class, obj_class, pk):
     return Response(serializer.data, status.HTTP_200_OK)
 
 
-class GenericViewSet(viewsets.ViewSet):
+class GenericViewSet(viewsets.ModelViewSet):
     """Generic view set for basic CRUD REST Service.
     To use it a ViewSet has to inherit from it and add the attributes.
 
@@ -172,22 +60,6 @@ class GenericViewSet(viewsets.ViewSet):
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     obj_class = None
     serializer_class = None
-
-    def list(self, request):
-        return generic_rest_list_objects(request, self.serializer_class, self.obj_class)
-
-    def create(self, request):
-        return generic_rest_create_object(request, self.serializer_class, self.obj_class)
-
-    def retrieve(self, request, pk=None):
-        return generic_rest_retrieve_object(request, self.serializer_class, self.obj_class, pk)
-
-    def update(self, request, pk=None):
-        return generic_rest_update_object(request, self.serializer_class,
-                                          self.obj_class, pk, False)
-
-    def partial_update(self, request, pk=None):
-        return generic_rest_update_object(request, self.serializer_class, self.obj_class, pk, True)
 
     def destroy(self, request, pk=None):
         return generic_rest_soft_delete(request, self.serializer_class, self.obj_class, pk)
@@ -310,3 +182,24 @@ class GenericAPITest(APITestCase):
             if key in serialized_object:
                 self.assertEqual(str(self.data_edition_test[key]), str(serialized_object[key]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_delete_object(self):
+        """Test that an object can be deleted.
+        """
+        edit_obj_instance = self.test_objects[self.edition_obj_idx]
+        request = self.factory.delete(reverse(self.url_detail,
+                                              kwargs={'pk': edit_obj_instance.id}),
+                                      data=self.data_edition_test)
+        token = Token.objects.get(user=self.user)
+        force_authenticate(request, user=self.user, token=token)
+        response = self.view(request, pk=edit_obj_instance.id)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        request = self.factory.get(reverse(self.url_list))
+        token = Token.objects.get(user=self.user)
+        force_authenticate(request, user=self.user, token=token)
+        response = self.view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.number_of_initial_objects - 1, len(response.data))
