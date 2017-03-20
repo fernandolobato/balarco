@@ -30,6 +30,36 @@ class IgualaViewSet(utils.GenericViewSet):
     queryset = models.Iguala.objects.filter(is_active=True)
     serializer_class = serializers.IgualaSerializer
 
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            new_obj = self.obj_class.objects.create(**serializer.validated_data)
+            art_igualas = request.data['art_iguala']
+            for art_iguala in art_igualas:
+                serializer_art_iguala = serializers.ArtIgualaSerializer(data=art_iguala)
+                if serializer_art_iguala.is_valid():
+                    art_type = models.ArtType.objects.get(pk=art_iguala['art_type'])
+                    quantity = art_iguala['quantity']
+                    models.ArtIguala.objects.create(iguala=new_obj,
+                                                    art_type=art_type,
+                                                    quantity=quantity)
+                else:
+                    query_art_iguala = models.ArtIguala.objects.filter(iguala=new_obj)
+                    for art_iguala in query_art_iguala:
+                        art_iguala.delete()
+                    new_obj.delete()
+                    return Response({
+                        'status': 'Bad request',
+                        'message': '%s could not be created with received data.' %
+                                   self.obj_class.__name__
+                    }, status=status.HTTP_400_BAD_REQUEST)
+            # print(self.serializer_class(new_obj).data)
+            return Response(self.serializer_class(new_obj).data, status=status.HTTP_201_CREATED)
+        return Response({
+            'status': 'Bad request',
+            'message': '%s could not be created with received data.' % self.obj_class.__name__
+        }, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ArtIgualaViewSet(utils.GenericViewSet):
     """ViewSet for ArtIguala CRUD REST Service that inherits from utils.GenericViewSet
