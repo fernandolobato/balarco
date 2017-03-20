@@ -21,11 +21,11 @@ class ArtTypeSerializer(serializers.ModelSerializer):
 
 class ArtIgualaSerializer(serializers.ModelSerializer):
 
-    art_type_complete = ArtTypeSerializer(source='art_type', read_only=True)
+    art_type_name = serializers.CharField(source='art_type.name', read_only=True)
 
     class Meta:
         model = models.ArtIguala
-        fields = ('id', 'iguala', 'art_type', 'quantity', 'art_type_complete')
+        fields = ('id', 'iguala', 'art_type', 'quantity', 'art_type_name')
 
 
 class IgualaSerializer(serializers.ModelSerializer):
