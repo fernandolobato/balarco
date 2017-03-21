@@ -66,12 +66,12 @@ class IgualaViewSet(utils.GenericViewSet):
         serializer = self.serializer_class(obj, data=request.data)
         if serializer.is_valid():
             updated_obj = serializer.save()
-            if not 'art_iguala' in request.data:
+            if 'art_iguala' not in request.data:
                 return Response(self.serializer_class(updated_obj).data, status.HTTP_200_OK)
             art_igualas = request.data['art_iguala']
             for art_iguala in art_igualas:
                 art_type_id = art_iguala['art_type']
-                update_art_iguala_obj = models.ArtIguala.objects.get(iguala=updated_obj.id, 
+                update_art_iguala_obj = models.ArtIguala.objects.get(iguala=updated_obj.id,
                                                                      art_type=art_type_id)
                 serializer_art_iguala = serializers.ArtIgualaSerializer(update_art_iguala_obj,
                                                                         data=art_iguala,
@@ -87,7 +87,7 @@ class IgualaViewSet(utils.GenericViewSet):
             return Response(self.serializer_class(updated_obj).data, status.HTTP_200_OK)
         return Response({
             'status': 'Bad request',
-            'message': '%s could not be updated with received data.' % obj_class.__name__
+            'message': '%s could not be updated with received data.' % self.obj_class.__name__
         }, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk=None):
