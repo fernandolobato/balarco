@@ -1,7 +1,9 @@
 from django.core.urlresolvers import reverse
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework import status
 from .models import User
+from . import views, serializers
+from balarco import utils
 
 
 class TokenCreationTest(APITestCase):
@@ -84,10 +86,58 @@ class UserRegistrationTest(APITestCase):
         """
         url = reverse('users:api_registration')
         data = {
-                'username': 'marcoantonio@gmail.com',
-                'password': 'marcoantonio123456',
                 'first_name': 'Marco',
-                'last_name': 'Lopez'
+                'last_name': 'Lopez',
+                'password': 'marcoantonio123456'
                 }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class UserAPITest(utils.GenericAPITest):
+    """Tests to verify the basic usage of the REST API to create, modify and list users.
+    It inherits from utils.GenericAPITest and add the necessary class attributes.
+    """
+    def setUp(self):
+        self.user = User.objects.create_user(username='test_user@example.com',
+                                             password='test_password')
+        url = reverse('users:api_login')
+        data = {'username': 'test_user@example.com', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
+
+        self.obj_class = User
+        self.serializer_class = serializers.UserSerializer
+
+        test_user_1 = User.objects.create_user(
+            username='marcoantonio@example.com', first_name='Marco',
+            last_name='Lopez', email='marcolm485@gmail.com',
+            password='marcolopez')
+        test_user_2 = User.objects.create_user(
+            username='juliannieb@example.com', first_name='Julian',
+            last_name='Niebieskikwiat', email='juliannieb@gmail.com',
+            password='juliannieb')
+
+        self.test_objects = [self.user, test_user_1, test_user_2]
+        self.number_of_initial_objects = len(self.test_objects)
+
+        self.data_creation_test = {
+            'username': 'new_user@example.com',
+            }
+
+        self.data_edition_test = {
+            'username': 'different_address@example.com',
+            }
+
+        self.edition_obj_idx = 0
+
+        self.view = views.UserViewSet.as_view({
+                                'get': 'list',
+                                'post': 'create',
+                                'put': 'update',
+                                'patch': 'partial_update',
+                                'delete': 'destroy'
+                                })
+
+        self.url_list = 'users:users-list'
+        self.url_detail = 'users:users-detail'
+        self.factory = APIRequestFactory()
