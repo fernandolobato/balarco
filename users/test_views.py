@@ -122,6 +122,7 @@ class UserAPITest(utils.GenericAPITest):
 
         self.data_creation_test = {
             'username': 'new_user@example.com',
+            'password': 'new_user_password',
             }
 
         self.data_edition_test = {
