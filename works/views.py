@@ -79,18 +79,18 @@ class IgualaViewSet(utils.GenericViewSet):
                 art_type_id = art_iguala['art_type']
                 try:
                     update_art_iguala_obj = models.ArtIguala.objects.get(iguala=updated_obj.id,
-                                                                     art_type=art_type_id)
+                                                                         art_type=art_type_id)
                 except models.ArtIguala.DoesNotExist:
                     update_art_iguala_obj = None
                 if update_art_iguala_obj is not None:
                     if not utils.update_object_from_data(serializers.ArtIgualaSerializer,
-                                                     update_art_iguala_obj,
-                                                     art_iguala):
+                                                         update_art_iguala_obj,
+                                                         art_iguala):
                         return utils.response_object_could_not_be_created(self.obj_class)
-                else: 
+                else:
                     if not utils.save_object_from_data(models.ArtIguala,
-                                                 serializers.ArtIgualaSerializer,
-                                                 art_iguala):
+                                                       serializers.ArtIgualaSerializer,
+                                                       art_iguala):
                         return utils.response_object_could_not_be_created(self.obj_class)
 
             return Response(self.serializer_class(updated_obj).data, status.HTTP_200_OK)
