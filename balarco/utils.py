@@ -1,3 +1,4 @@
+import django_filters.rest_framework
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 from rest_framework import viewsets, status
@@ -60,6 +61,7 @@ class GenericViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     obj_class = None
     serializer_class = None
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
 
     def destroy(self, request, pk=None):
         return generic_rest_soft_delete(request, self.serializer_class, self.obj_class, pk)

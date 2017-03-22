@@ -1,4 +1,3 @@
-import django_filters.rest_framework
 from rest_framework.decorators import detail_route
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -15,7 +14,6 @@ class WorkTypeViewSet(utils.GenericViewSet):
     obj_class = models.WorkType
     queryset = models.WorkType.objects.filter(is_active=True)
     serializer_class = serializers.WorkTypeSerializer
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = works_filters.WorkTypeFilter
 
 
@@ -25,7 +23,6 @@ class ArtTypeViewSet(utils.GenericViewSet):
     obj_class = models.ArtType
     queryset = models.ArtType.objects.filter(is_active=True)
     serializer_class = serializers.ArtTypeSerializer
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = works_filters.ArtTypeFilter
 
 
@@ -35,7 +32,6 @@ class IgualaViewSet(utils.GenericViewSet):
     obj_class = models.Iguala
     queryset = models.Iguala.objects.filter(is_active=True)
     serializer_class = serializers.IgualaSerializer
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = works_filters.IgualaFilter
 
     def create(self, request):
@@ -108,7 +104,6 @@ class ArtIgualaViewSet(utils.GenericViewSet):
     obj_class = models.ArtIguala
     queryset = models.ArtIguala.objects.filter(is_active=True)
     serializer_class = serializers.ArtIgualaSerializer
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = works_filters.ArtIgualaFilter
 
 
@@ -118,7 +113,6 @@ class WorkViewSet(utils.GenericViewSet):
     obj_class = models.Work
     queryset = models.Work.objects.filter(is_active=True)
     serializer_class = serializers.WorkSerializer
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = works_filters.WorkFilter
 
     @detail_route(methods=['get'], url_path='possible-status-changes')
@@ -136,7 +130,6 @@ class ArtWorkViewSet(utils.GenericViewSet):
     obj_class = models.ArtWork
     queryset = models.ArtWork.objects.filter(is_active=True)
     serializer_class = serializers.ArtWorkSerializer
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = works_filters.ArtWorkFilter
 
 
@@ -146,7 +139,6 @@ class FileViewSet(utils.GenericViewSet):
     obj_class = models.File
     queryset = models.File.objects.filter(is_active=True)
     serializer_class = serializers.FileSerializer
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = works_filters.FileFilter
 
 
@@ -156,7 +148,6 @@ class WorkDesignerViewSet(utils.GenericViewSet):
     obj_class = models.WorkDesigner
     queryset = models.WorkDesigner.objects.filter(is_active=True)
     serializer_class = serializers.WorkDesignerSerializer
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = works_filters.WorkDesignerFilter
 
 
@@ -166,5 +157,4 @@ class StatusChangeViewSet(utils.GenericViewSet):
     obj_class = models.StatusChange
     queryset = models.StatusChange.objects.filter(is_active=True)
     serializer_class = serializers.StatusChangeSerializer
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = works_filters.StatusChangeFilter
