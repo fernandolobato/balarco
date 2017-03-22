@@ -206,7 +206,8 @@ class IgualaAPITest(utils.GenericAPITest):
             'client': client_oxxo.id,
             'name': 'Iguala Oxxo 1',
             'start_date': datetime.date.today(),
-            'end_date': datetime.date.today()
+            'end_date': datetime.date.today(),
+            'art_iguala': [art_iguala1, art_iguala2]
             }
 
         self.edition_obj_idx = 1
