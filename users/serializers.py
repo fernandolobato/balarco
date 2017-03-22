@@ -9,13 +9,11 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    groups_complete = GroupSerializer(source='groups', read_only=True, many=True)
-
     class Meta:
         model = User
         fields = ('id', 'username', 'password', 'first_name',
-                  'last_name', 'groups', 'groups_complete')
+                  'last_name', 'groups')
         extra_kwargs = {
                         'username': {'required': True},
-                        'password': {'required': True}
+                        'password': {'required': False}
                         }
