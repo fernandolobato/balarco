@@ -25,17 +25,17 @@ class WorkTypeAPITest(utils.GenericAPITest):
         self.serializer_class = serializers.WorkTypeSerializer
 
         work_type_proyecto = models.WorkType.objects.create(
-            name='Proyecto')
+            work_type_id=0)
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         self.test_objects = [work_type_proyecto, work_type_graduacion, work_type_iguala]
         self.number_of_initial_objects = len(self.test_objects)
 
         self.data_creation_test = {
-            'name': 'Work type 4',
+            'work_type_id': 2,
             }
 
         self.data_filtering_test = {
@@ -45,7 +45,7 @@ class WorkTypeAPITest(utils.GenericAPITest):
         self.number_of_filtered_objects = 1
 
         self.data_edition_test = {
-            'name': 'Proyectos',
+            'work_type_id': 2,
             }
 
         self.edition_obj_idx = 0
@@ -78,9 +78,9 @@ class ArtTypeAPITest(utils.GenericAPITest):
         self.serializer_class = serializers.ArtTypeSerializer
 
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         art_type_arte_complejo = models.ArtType.objects.create(
             name='Arte complejo',
@@ -165,7 +165,7 @@ class IgualaAPITest(utils.GenericAPITest):
             end_date=datetime.date.today())
 
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         art_type_arte_complejo = models.ArtType.objects.create(
             name='Arte complejo',
@@ -262,7 +262,7 @@ class ArtIgualaAPITest(utils.GenericAPITest):
             end_date=datetime.date.today())
 
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         art_type_arte_complejo = models.ArtType.objects.create(
             name='Arte complejo',
@@ -368,9 +368,9 @@ class WorkAPITest(utils.GenericAPITest):
             end_date=datetime.date.today())
 
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         status_pendiente = models.Status.objects.create(
             status_id=models.Status.STATUS_PENDIENTE)
@@ -485,9 +485,9 @@ class ArtWorkAPITest(utils.GenericAPITest):
             end_date=datetime.date.today())
 
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         art_type_arte_complejo = models.ArtType.objects.create(
             name='Arte complejo',
@@ -622,9 +622,9 @@ class FileAPITest(utils.GenericAPITest):
             end_date=datetime.date.today())
 
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         status_pendiente = models.Status.objects.create(
             status_id=models.Status.STATUS_PENDIENTE)
@@ -750,9 +750,9 @@ class WorkDesignerAPITest(utils.GenericAPITest):
             end_date=datetime.date.today())
 
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         status_pendiente = models.Status.objects.create(
             status_id=models.Status.STATUS_PENDIENTE)
@@ -876,9 +876,9 @@ class StatusChangeAPITest(utils.GenericAPITest):
             end_date=datetime.date.today())
 
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         status_pendiente = models.Status.objects.create(
             status_id=models.Status.STATUS_PENDIENTE)

@@ -7,9 +7,11 @@ from users import serializers as user_serializers
 
 class WorkTypeSerializer(serializers.ModelSerializer):
 
+    name = serializers.CharField(read_only=True)
+
     class Meta:
         model = models.WorkType
-        fields = ('id', 'name',)
+        fields = ('id', 'work_type_id', 'name',)
 
 
 class ArtTypeSerializer(serializers.ModelSerializer):

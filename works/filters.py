@@ -5,7 +5,7 @@ from . import models as works_models
 class WorkTypeFilter(django_filters.rest_framework.FilterSet):
     class Meta:
         model = works_models.WorkType
-        fields = ['id', 'name']
+        fields = ['id', 'work_type_id', 'name']
 
 
 class ArtTypeFilter(django_filters.rest_framework.FilterSet):
