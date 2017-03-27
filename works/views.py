@@ -128,6 +128,14 @@ class WorkViewSet(utils.GenericViewSet):
         serializer = serializers.StatusSerializer(possible_status_changes, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            new_obj = self.obj_class.objects.create(**serializer.validated_data)
+            return Response(self.serializer_class(new_obj).data, status=status.HTTP_201_CREATED)
+
+        return utils.response_object_could_not_be_created(self.obj_class)
+
 
 class ArtWorkViewSet(utils.GenericViewSet):
     """ViewSet for ArtWork CRUD REST Service that inherits from utils.GenericViewSet

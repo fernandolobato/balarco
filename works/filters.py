@@ -9,9 +9,12 @@ class WorkTypeFilter(django_filters.rest_framework.FilterSet):
 
 
 class ArtTypeFilter(django_filters.rest_framework.FilterSet):
+
+    work_work_type_id = django_filters.NumberFilter(name='work_type__work_type_id')
+
     class Meta:
         model = works_models.ArtType
-        fields = ['id', 'work_type', 'name']
+        fields = ['id', 'work_type', 'name', 'work_work_type_id']
 
 
 class IgualaFilter(django_filters.rest_framework.FilterSet):
