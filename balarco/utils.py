@@ -17,6 +17,31 @@ GROUP_DISENADOR_JR = "Diseñador JR"
 GROUP_SUPERUSUARIO = "Super usuario"
 
 
+def save_object_from_data(obj_class, serializer_class, data):
+    obj_serializer = serializer_class(data=data)
+    if obj_serializer.is_valid():
+        obj_class.objects.create(**obj_serializer.validated_data)
+        return True
+    else:
+        return False
+
+
+def update_object_from_data(serializer_class, update_obj, data):
+    obj_serializer = serializer_class(update_obj, data=data, partial=True)
+    if obj_serializer.is_valid():
+        obj_serializer.save()
+        return True
+    else:
+        return False
+
+
+def response_object_could_not_be_created(obj_class):
+    return Response({
+        'status': 'Bad request',
+        'message': '%s could not be created with received data.' % obj_class.__name__
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+
 def generic_rest_soft_delete(request, serializer_class, obj_class, pk):
     """Function used by GenericViewSet:destroy to make a soft delete of the specified object.
     This means that the object is not truly deleted but its active state change to false.
