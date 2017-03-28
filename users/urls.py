@@ -9,7 +9,7 @@ app_name = 'users'
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet, base_name='users')
-
+router.register(r'groups', views.GroupViewSet, base_name='groups')
 
 urlpatterns = [
     url(r'^auth/login/', authviews.obtain_auth_token, name='api_login'),
