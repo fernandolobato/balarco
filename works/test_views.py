@@ -38,6 +38,12 @@ class WorkTypeAPITest(utils.GenericAPITest):
             'name': 'Work type 4',
             }
 
+        self.data_filtering_test = {
+            'name': 'Proyecto',
+        }
+
+        self.number_of_filtered_objects = 1
+
         self.data_edition_test = {
             'name': 'Proyectos',
             }
@@ -96,6 +102,12 @@ class ArtTypeAPITest(utils.GenericAPITest):
             'work_type': work_type_graduacion.id
             }
 
+        self.data_filtering_test = {
+            'name': 'Invitación',
+        }
+
+        self.number_of_filtered_objects = 1
+
         self.data_edition_test = {
             'name': 'Arte complejo 2',
             'work_type': work_type_iguala.id
@@ -152,6 +164,27 @@ class IgualaAPITest(utils.GenericAPITest):
             start_date=datetime.date.today(),
             end_date=datetime.date.today())
 
+        work_type_iguala = models.WorkType.objects.create(
+            name='Iguala')
+
+        art_type_arte_complejo = models.ArtType.objects.create(
+            name='Arte complejo',
+            work_type=work_type_iguala)
+
+        art_type_arte_abstracto = models.ArtType.objects.create(
+            name='Arte abstracto',
+            work_type=work_type_iguala)
+
+        art_iguala1 = {
+            'art_type': art_type_arte_complejo.id,
+            'quantity': 50
+        }
+
+        art_iguala2 = {
+            'art_type': art_type_arte_abstracto.id,
+            'quantity': 80
+        }
+
         self.test_objects = [iguala_starbucks, iguala_oxxo]
         self.number_of_initial_objects = len(self.test_objects)
 
@@ -159,14 +192,22 @@ class IgualaAPITest(utils.GenericAPITest):
             'client': client_oxxo.id,
             'name': 'Iguala Oxxo 2',
             'start_date': datetime.date.today(),
-            'end_date': datetime.date.today()
+            'end_date': datetime.date.today(),
+            'art_iguala': [art_iguala1, art_iguala2]
             }
+
+        self.data_filtering_test = {
+            'name': 'Iguala Oxxo',
+        }
+
+        self.number_of_filtered_objects = 1
 
         self.data_edition_test = {
             'client': client_oxxo.id,
             'name': 'Iguala Oxxo 1',
             'start_date': datetime.date.today(),
-            'end_date': datetime.date.today()
+            'end_date': datetime.date.today(),
+            'art_iguala': [art_iguala1, art_iguala2]
             }
 
         self.edition_obj_idx = 1
@@ -249,6 +290,12 @@ class ArtIgualaAPITest(utils.GenericAPITest):
             'art_type': art_type_arte_abstracto.id,
             'quantity': 20
             }
+
+        self.data_filtering_test = {
+            'quantity': 50,
+        }
+
+        self.number_of_filtered_objects = 1
 
         self.data_edition_test = {
             'iguala': iguala_oxxo.id,
@@ -360,6 +407,12 @@ class WorkAPITest(utils.GenericAPITest):
             'expected_delivery_date': '2017-05-18',
             'brief': 'Brief3'
             }
+
+        self.data_filtering_test = {
+            'contact': contact_instance_julian.id,
+        }
+
+        self.number_of_filtered_objects = 1
 
         self.data_edition_test = {
             'name': 'Work graduacion starbucks',
@@ -494,6 +547,12 @@ class ArtWorkAPITest(utils.GenericAPITest):
             'quantity': 300
             }
 
+        self.data_filtering_test = {
+            'art_type': art_type_invitacion.id,
+        }
+
+        self.number_of_filtered_objects = 1
+
         self.data_edition_test = {
             'quantity': 300
             }
@@ -607,6 +666,12 @@ class FileAPITest(utils.GenericAPITest):
             'work': work_iguala_starbucks.id,
             'upload': file3.file,
             }
+
+        self.data_filtering_test = {
+            'work': work_iguala_starbucks.id,
+        }
+
+        self.number_of_filtered_objects = 1
 
         self.data_edition_test = {
             'work': work_graduacion_oxxo.id
@@ -730,6 +795,12 @@ class WorkDesignerAPITest(utils.GenericAPITest):
             'active_work': True
             }
 
+        self.data_filtering_test = {
+            'designer': designer2.id,
+        }
+
+        self.number_of_filtered_objects = 1
+
         self.data_edition_test = {
             'designer': designer2.id,
             'work': work_graduacion_oxxo.id,
@@ -849,6 +920,12 @@ class StatusChangeAPITest(utils.GenericAPITest):
             'status': status_diseno.id,
             'user': designer2.id
             }
+
+        self.data_filtering_test = {
+            'work': work_iguala_starbucks.id,
+        }
+
+        self.number_of_filtered_objects = 1
 
         self.data_edition_test = {
             'status': status_pendiente.id,

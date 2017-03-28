@@ -65,6 +65,12 @@ class ContactTest(utils.GenericAPITest):
             'is_active': True
             }
 
+        self.data_filtering_test = {
+            'client': client_instance_starbucks.id,
+        }
+
+        self.number_of_filtered_objects = 2
+
         self.data_edition_test = {
             'name': 'Julian',
             'last_name': 'Niebieskikiwat',
@@ -126,6 +132,12 @@ class ClientTest(utils.GenericAPITest):
             'address': 'Calle 5 de Mayo 350',
             'is_active': True
             }
+
+        self.data_filtering_test = {
+            'name': 'Test Starbucks',
+        }
+
+        self.number_of_filtered_objects = 1
 
         self.data_edition_test = {
             'name': 'OXXO',

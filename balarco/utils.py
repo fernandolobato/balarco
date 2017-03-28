@@ -1,3 +1,4 @@
+import django_filters.rest_framework
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 from rest_framework import viewsets, status
@@ -14,6 +15,31 @@ GROUP_DIR_ARTE = "Director de arte"
 GROUP_DISENADOR_SR = "Diseñador SR"
 GROUP_DISENADOR_JR = "Diseñador JR"
 GROUP_SUPERUSUARIO = "Super usuario"
+
+
+def save_object_from_data(obj_class, serializer_class, data):
+    obj_serializer = serializer_class(data=data)
+    if obj_serializer.is_valid():
+        obj_class.objects.create(**obj_serializer.validated_data)
+        return True
+    else:
+        return False
+
+
+def update_object_from_data(serializer_class, update_obj, data):
+    obj_serializer = serializer_class(update_obj, data=data, partial=True)
+    if obj_serializer.is_valid():
+        obj_serializer.save()
+        return True
+    else:
+        return False
+
+
+def response_object_could_not_be_created(obj_class):
+    return Response({
+        'status': 'Bad request',
+        'message': '%s could not be created with received data.' % obj_class.__name__
+    }, status=status.HTTP_400_BAD_REQUEST)
 
 
 def generic_rest_soft_delete(request, serializer_class, obj_class, pk):
@@ -60,6 +86,7 @@ class GenericViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     obj_class = None
     serializer_class = None
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
 
     def destroy(self, request, pk=None):
         return generic_rest_soft_delete(request, self.serializer_class, self.obj_class, pk)
@@ -148,6 +175,23 @@ class GenericAPITest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.number_of_initial_objects, len(response.data))
+        for obj in response.data:
+            object_instance = self.obj_class.objects.get(id=obj['id'])
+            serialized_object = self.serializer_class(object_instance)
+            for key in obj.keys():
+                if key in serialized_object:
+                    self.assertEqual(str(obj[key]), str(serialized_object[key]))
+
+    def test_filters(self):
+        """Tests that all class objects can be filtered through the REST API endpoint.
+        """
+        request = self.factory.get(reverse(self.url_list), data=self.data_filtering_test)
+        token = Token.objects.get(user=self.user)
+        force_authenticate(request, user=self.user, token=token)
+        response = self.view(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.number_of_filtered_objects, len(response.data))
         for obj in response.data:
             object_instance = self.obj_class.objects.get(id=obj['id'])
             serialized_object = self.serializer_class(object_instance)
