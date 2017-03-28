@@ -49,11 +49,9 @@ class IgualaViewSet(utils.GenericViewSet):
             art_igualas = request.data['art_iguala']
             for art_iguala in art_igualas:
                 art_iguala['iguala'] = new_obj.id
-                if utils.save_object_from_data(models.ArtIguala,
-                                               serializers.ArtIgualaSerializer,
-                                               art_iguala):
-                    continue
-                else:
+                if not utils.save_object_from_data(models.ArtIguala,
+                                                   serializers.ArtIgualaSerializer,
+                                                   art_iguala):
                     query_art_iguala = models.ArtIguala.objects.filter(iguala=new_obj)
                     for art_iguala in query_art_iguala:
                         art_iguala.delete()
