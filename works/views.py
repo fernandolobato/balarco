@@ -2,6 +2,7 @@ from rest_framework.decorators import detail_route
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
+from django.db import transaction
 
 from . import models, serializers
 from . import filters as works_filters
@@ -34,11 +35,13 @@ class IgualaViewSet(utils.GenericViewSet):
     serializer_class = serializers.IgualaSerializer
     filter_class = works_filters.IgualaFilter
 
+    @transaction.atomic
     def create(self, request):
         """Overrided method because an Iguala has a list of Art types associated.
         All objects are sended directly in the same WS and here are processed.
         A roll back is done in case of failure so it's an atomic function
         """
+        sid = transaction.savepoint()
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             new_obj = self.obj_class.objects.create(**serializer.validated_data)
@@ -48,15 +51,12 @@ class IgualaViewSet(utils.GenericViewSet):
                 if not utils.save_object_from_data(models.ArtIguala,
                                                    serializers.ArtIgualaSerializer,
                                                    art_iguala):
-                    query_art_iguala = models.ArtIguala.objects.filter(iguala=new_obj)
-                    for art_iguala in query_art_iguala:
-                        art_iguala.delete()
-                    new_obj.delete()
-
+                    transaction.savepoint_rollback(sid)
                     return utils.response_object_could_not_be_created(self.obj_class)
 
             return Response(self.serializer_class(new_obj).data, status=status.HTTP_201_CREATED)
 
+        transaction.savepoint_rollback(sid)
         return utils.response_object_could_not_be_created(self.obj_class)
 
     def update(self, request, pk=None):
