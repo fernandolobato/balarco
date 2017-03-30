@@ -337,6 +337,7 @@ class File(models.Model):
     """
     work = models.ForeignKey(Work, related_name='files', on_delete=models.CASCADE)
 
+    filename = models.CharField(max_length=300)
     upload = models.FileField(upload_to='work_files/')
     is_active = models.BooleanField(default=True)
 
@@ -392,7 +393,7 @@ class StatusChange(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return '{} - {} - {}'.format(self.work, self.status, self.date)
+        return '{} - {} - {} - {}'.format(self.user, self.work, self.status, self.date)
 
     def save(self, *args, **kwargs):
         self.date = timezone.now()

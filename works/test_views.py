@@ -653,9 +653,11 @@ class FileAPITest(utils.GenericAPITest):
         file2 = SimpleUploadedFile("file2.txt", b"file_content")
         file_instance_1 = models.File.objects.create(
             work=work_iguala_starbucks,
+            filename='File1',
             upload=file1)
         file_instance_2 = models.File.objects.create(
             work=work_graduacion_oxxo,
+            filename='File2',
             upload=file2)
 
         self.test_objects = [file_instance_1, file_instance_2]
@@ -664,6 +666,7 @@ class FileAPITest(utils.GenericAPITest):
         file3 = SimpleUploadedFile("file3.txt", b"file_content")
         self.data_creation_test = {
             'work': work_iguala_starbucks.id,
+            'filename': 'File3',
             'upload': file3.file,
             }
 

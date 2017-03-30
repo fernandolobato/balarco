@@ -45,14 +45,15 @@ class IgualaViewSet(utils.GenericViewSet):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             new_obj = self.obj_class.objects.create(**serializer.validated_data)
-            art_igualas = request.data['art_iguala']
-            for art_iguala in art_igualas:
-                art_iguala['iguala'] = new_obj.id
-                if not utils.save_object_from_data(models.ArtIguala,
-                                                   serializers.ArtIgualaSerializer,
-                                                   art_iguala):
-                    transaction.savepoint_rollback(sid)
-                    return utils.response_object_could_not_be_created(self.obj_class)
+            if 'art_iguala' in request.data:
+                art_igualas = request.data['art_iguala']
+                for art_iguala in art_igualas:
+                    art_iguala['iguala'] = new_obj.id
+                    if not utils.save_object_from_data(models.ArtIguala,
+                                                       serializers.ArtIgualaSerializer,
+                                                       art_iguala):
+                        transaction.savepoint_rollback(sid)
+                        return utils.response_object_could_not_be_created(self.obj_class)
 
             return Response(self.serializer_class(new_obj).data, status=status.HTTP_201_CREATED)
 
@@ -67,29 +68,28 @@ class IgualaViewSet(utils.GenericViewSet):
         serializer = self.serializer_class(obj, data=request.data)
         if serializer.is_valid():
             updated_obj = serializer.save()
-            if 'art_iguala' not in request.data:
-                return Response(self.serializer_class(updated_obj).data, status.HTTP_200_OK)
-            art_igualas = request.data['art_iguala']
-            for art_iguala in art_igualas:
-                art_iguala['iguala'] = updated_obj.id
-                art_type_id = art_iguala['art_type']
-                try:
-                    update_art_iguala_obj = models.ArtIguala.objects.get(iguala=updated_obj.id,
-                                                                         art_type=art_type_id)
-                except models.ArtIguala.DoesNotExist:
-                    update_art_iguala_obj = None
-                if update_art_iguala_obj is not None:
-                    if not utils.update_object_from_data(serializers.ArtIgualaSerializer,
-                                                         update_art_iguala_obj,
-                                                         art_iguala):
-                        transaction.savepoint_rollback(sid)
-                        return utils.response_object_could_not_be_created(self.obj_class)
-                else:
-                    if not utils.save_object_from_data(models.ArtIguala,
-                                                       serializers.ArtIgualaSerializer,
-                                                       art_iguala):
-                        transaction.savepoint_rollback(sid)
-                        return utils.response_object_could_not_be_created(self.obj_class)
+            if 'art_iguala' in request.data:
+                art_igualas = request.data['art_iguala']
+                for art_iguala in art_igualas:
+                    art_iguala['iguala'] = updated_obj.id
+                    art_type_id = art_iguala['art_type']
+                    try:
+                        update_art_iguala_obj = models.ArtIguala.objects.get(iguala=updated_obj.id,
+                                                                             art_type=art_type_id)
+                    except models.ArtIguala.DoesNotExist:
+                        update_art_iguala_obj = None
+                    if update_art_iguala_obj is not None:
+                        if not utils.update_object_from_data(serializers.ArtIgualaSerializer,
+                                                             update_art_iguala_obj,
+                                                             art_iguala):
+                            transaction.savepoint_rollback(sid)
+                            return utils.response_object_could_not_be_created(self.obj_class)
+                    else:
+                        if not utils.save_object_from_data(models.ArtIguala,
+                                                           serializers.ArtIgualaSerializer,
+                                                           art_iguala):
+                            transaction.savepoint_rollback(sid)
+                            return utils.response_object_could_not_be_created(self.obj_class)
 
             return Response(self.serializer_class(updated_obj).data, status.HTTP_200_OK)
 
@@ -126,9 +126,37 @@ class WorkViewSet(utils.GenericViewSet):
         return Response(serializer.data, status.HTTP_200_OK)
 
     def create(self, request):
+        sid = transaction.savepoint()
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             new_obj = self.obj_class.objects.create(**serializer.validated_data)
+            if 'art_works' in request.data:
+                art_works = request.data['art_works']
+                for art_work in art_works:
+                    art_work['work'] = new_obj.id
+                    if not utils.save_object_from_data(models.ArtWork,
+                                                       serializers.ArtWorkSerializer,
+                                                       art_work):
+                        transaction.savepoint_rollback(sid)
+                        return utils.response_object_could_not_be_created(self.obj_class)
+
+            for filename, file in request.FILES.items():
+                name = request.FILES[filename].name
+                models.File.objects.create(work=new_obj, filename=name, upload=file)
+
+            if 'work_designers' in request.data:
+                work_designers = request.data['work_designers']
+                for work_designer in work_designers:
+                    work_designer['work'] = new_obj.id
+                    if not utils.save_object_from_data(models.WorkDesigner,
+                                                       serializers.WorkDesignerSerializer,
+                                                       work_designer):
+                        transaction.savepoint_rollback(sid)
+                        return utils.response_object_could_not_be_created(self.obj_class)
+
+            models.StatusChange.objects.create(work=new_obj, status=new_obj.current_status,
+                                               user=request.user)
+
             return Response(self.serializer_class(new_obj).data, status=status.HTTP_201_CREATED)
 
         return utils.response_object_could_not_be_created(self.obj_class)
