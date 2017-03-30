@@ -142,3 +142,6 @@ class UserAPITest(utils.GenericAPITest):
         self.url_list = 'users:users-list'
         self.url_detail = 'users:users-detail'
         self.factory = APIRequestFactory()
+
+    def test_filters(self):
+        pass
