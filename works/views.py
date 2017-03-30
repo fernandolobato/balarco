@@ -59,7 +59,9 @@ class IgualaViewSet(utils.GenericViewSet):
         transaction.savepoint_rollback(sid)
         return utils.response_object_could_not_be_created(self.obj_class)
 
+    @transaction.atomic
     def update(self, request, pk=None):
+        sid = transaction.savepoint()
         queryset = self.obj_class.objects.filter(is_active=True)
         obj = get_object_or_404(queryset, pk=pk)
         serializer = self.serializer_class(obj, data=request.data)
@@ -80,15 +82,18 @@ class IgualaViewSet(utils.GenericViewSet):
                     if not utils.update_object_from_data(serializers.ArtIgualaSerializer,
                                                          update_art_iguala_obj,
                                                          art_iguala):
+                        transaction.savepoint_rollback(sid)
                         return utils.response_object_could_not_be_created(self.obj_class)
                 else:
                     if not utils.save_object_from_data(models.ArtIguala,
                                                        serializers.ArtIgualaSerializer,
                                                        art_iguala):
+                        transaction.savepoint_rollback(sid)
                         return utils.response_object_could_not_be_created(self.obj_class)
 
             return Response(self.serializer_class(updated_obj).data, status.HTTP_200_OK)
 
+        transaction.savepoint_rollback(sid)
         return utils.response_object_could_not_be_created(self.obj_class)
 
     def partial_update(self, request, pk=None):
