@@ -138,7 +138,6 @@ class WorkViewSet(utils.GenericViewSet):
                                                        serializers.ArtWorkSerializer,
                                                        art_work):
                         transaction.savepoint_rollback(sid)
-                        print("Invalid art_type")
                         return utils.response_object_could_not_be_created(self.obj_class)
 
             for filename, file in request.FILES.items():
@@ -153,7 +152,6 @@ class WorkViewSet(utils.GenericViewSet):
                                                        serializers.WorkDesignerSerializer,
                                                        work_designer):
                         transaction.savepoint_rollback(sid)
-                        print("Invalid work_designer")
                         return utils.response_object_could_not_be_created(self.obj_class)
 
             models.StatusChange.objects.create(work=new_obj, status=new_obj.current_status,
@@ -161,8 +159,6 @@ class WorkViewSet(utils.GenericViewSet):
 
             return Response(self.serializer_class(new_obj).data, status=status.HTTP_201_CREATED)
 
-        print("Invalid work")
-        print(serializer.errors)
         return utils.response_object_could_not_be_created(self.obj_class)
 
     def update(self, request, pk=None):
