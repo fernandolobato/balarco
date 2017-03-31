@@ -414,10 +414,16 @@ class WorkAPITest(utils.GenericAPITest):
 
         self.number_of_filtered_objects = 1
 
+        work_designer1 = {
+            'designer': self.user.id,
+            'active_work': True
+            }
+
         self.data_edition_test = {
             'name': 'Work graduacion starbucks',
             'expected_delivery_date': '2017-08-20',
-            'brief': 'Brief2 edited'
+            'brief': 'Brief2 edited',
+            'work_designers': [work_designer1,]
             }
 
         self.edition_obj_idx = 1

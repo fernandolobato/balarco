@@ -65,7 +65,7 @@ class IgualaViewSet(utils.GenericViewSet):
         sid = transaction.savepoint()
         queryset = self.obj_class.objects.filter(is_active=True)
         obj = get_object_or_404(queryset, pk=pk)
-        serializer = self.serializer_class(obj, data=request.data)
+        serializer = self.serializer_class(obj, data=request.data, partial=True)
         if serializer.is_valid():
             updated_obj = serializer.save()
             if 'art_iguala' in request.data:
@@ -160,6 +160,81 @@ class WorkViewSet(utils.GenericViewSet):
             return Response(self.serializer_class(new_obj).data, status=status.HTTP_201_CREATED)
 
         return utils.response_object_could_not_be_created(self.obj_class)
+
+    def update(self, request, pk=None):
+        sid = transaction.savepoint()
+        queryset = self.obj_class.objects.filter(is_active=True)
+        obj = get_object_or_404(queryset, pk=pk)
+        serializer = self.serializer_class(obj, data=request.data, partial=True)
+        if serializer.is_valid():
+            status_has_changed = False
+            if 'current_status' in request.data:
+                status_has_changed = request.data['current_status'] != obj.current_status.id
+            updated_obj = serializer.save()
+            if 'art_works' in request.data:
+                art_works = request.data['art_works']
+                for art_work in art_works:
+                    art_work['work'] = updated_obj.id
+                    art_type_id = art_work['art_type']
+                    try:
+                        update_art_work_obj = models.ArtWork.objects.get(work=updated_obj.id,
+                                                                         art_type=art_type_id)
+                    except models.ArtWork.DoesNotExist:
+                        update_art_work_obj = None
+                    if update_art_work_obj is not None:
+                        if not utils.update_object_from_data(serializers.ArtWorkSerializer,
+                                                             update_art_work_obj,
+                                                             art_work):
+                            transaction.savepoint_rollback(sid)
+                            return utils.response_object_could_not_be_created(self.obj_class)
+                    else:
+                        if not utils.save_object_from_data(models.ArtWork,
+                                                           serializers.ArtWorkSerializer,
+                                                           art_work):
+                            transaction.savepoint_rollback(sid)
+                            return utils.response_object_could_not_be_created(self.obj_class)
+
+            for filename, file in request.FILES.items():
+                name = request.FILES[filename].name
+                models.File.objects.create(work=updated_obj, filename=name, upload=file)
+
+            if 'work_designers' in request.data:
+                work_designers = request.data['work_designers']
+                for work_designer in work_designers:
+                    work_designer['work'] = updated_obj.id
+                    designer_id = work_designer['designer']
+                    active_work = work_designer['active_work']
+                    try:
+                        update_work_designer = models.WorkDesigner.objects.get(work=updated_obj.id,
+                                                                          designer=designer_id,
+                                                                          active_work=True)
+                    except models.WorkDesigner.DoesNotExist:
+                        update_work_designer = None
+                    if update_work_designer is not None:
+                        if not utils.update_object_from_data(serializers.WorkDesignerSerializer,
+                                                             update_work_designer,
+                                                             work_designer):
+                            transaction.savepoint_rollback(sid)
+                            return utils.response_object_could_not_be_created(self.obj_class)
+                    else:
+                        if active_work:
+                            if not utils.save_object_from_data(models.WorkDesigner,
+                                                               serializers.WorkDesignerSerializer,
+                                                               work_designer):
+                                transaction.savepoint_rollback(sid)
+                                return utils.response_object_could_not_be_created(self.obj_class)
+
+            if status_has_changed:
+                models.StatusChange.objects.create(work=updated_obj,
+                                                   status=updated_obj.current_status,
+                                                   user=request.user)
+
+            return Response(self.serializer_class(updated_obj).data, status.HTTP_200_OK)
+
+        return utils.response_object_could_not_be_created(self.obj_class)
+
+    def partial_update(self, request, pk=None):
+        return self.update(request, pk)
 
 
 class ArtWorkViewSet(utils.GenericViewSet):
