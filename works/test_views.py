@@ -398,6 +398,39 @@ class WorkAPITest(utils.GenericAPITest):
         self.test_objects = [work_iguala_starbucks, work_graduacion_oxxo]
         self.number_of_initial_objects = len(self.test_objects)
 
+        art_type_arte_complejo = models.ArtType.objects.create(
+            name='Arte complejo',
+            work_type=work_type_iguala)
+        art_type_arte_abstracto = models.ArtType.objects.create(
+            name='Arte abstracto',
+            work_type=work_type_iguala)
+        art_type_invitacion = models.ArtType.objects.create(
+            name='Invitación',
+            work_type=work_type_graduacion)
+        art_type_menu = models.ArtType.objects.create(
+            name='Menú',
+            work_type=work_type_graduacion)
+
+        art_work1 = {
+            'art_type': art_type_arte_complejo.id,
+            'quantity': 300
+            }
+
+        art_work2 = {
+            'art_type': art_type_arte_abstracto.id,
+            'quantity': 200
+            }
+
+        art_work3 = {
+            'art_type': art_type_invitacion.id,
+            'quantity': 100
+            }
+
+        art_work4 = {
+            'art_type': art_type_menu.id,
+            'quantity': 50
+            }
+
         self.data_creation_test = {
             'executive': self.user.id,
             'contact': contact_instance_julian.id,
@@ -405,7 +438,8 @@ class WorkAPITest(utils.GenericAPITest):
             'work_type': work_type_graduacion.id,
             'name': 'Work graduacion starbucks',
             'expected_delivery_date': '2017-05-18',
-            'brief': 'Brief3'
+            'brief': 'Brief3',
+            'art_works': [art_work1, art_work2, art_work3, art_work4]
             }
 
         self.data_filtering_test = {
@@ -423,7 +457,7 @@ class WorkAPITest(utils.GenericAPITest):
             'name': 'Work graduacion starbucks',
             'expected_delivery_date': '2017-08-20',
             'brief': 'Brief2 edited',
-            'work_designers': [work_designer1,]
+            'work_designers': [work_designer1]
             }
 
         self.edition_obj_idx = 1
