@@ -162,6 +162,7 @@ class WorkViewSet(utils.GenericViewSet):
             return Response(self.serializer_class(new_obj).data, status=status.HTTP_201_CREATED)
 
         print("Invalid work")
+        print(serializer.errors)
         return utils.response_object_could_not_be_created(self.obj_class)
 
     def update(self, request, pk=None):
