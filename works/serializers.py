@@ -52,9 +52,11 @@ class StatusSerializer(serializers.ModelSerializer):
 
 class ArtWorkSerializer(serializers.ModelSerializer):
 
+    art_type_complete = ArtTypeSerializer(source='art_type', read_only=True)
+
     class Meta:
         model = models.ArtWork
-        fields = ('id', 'work', 'art_type', 'quantity',)
+        fields = ('id', 'work', 'art_type', 'quantity', 'art_type_complete')
 
 
 class FileSerializer(serializers.ModelSerializer):
