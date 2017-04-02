@@ -109,6 +109,15 @@ class ArtIgualaViewSet(utils.GenericViewSet):
     filter_class = works_filters.ArtIgualaFilter
 
 
+class StatusViewSet(utils.GenericViewSet):
+    """ViewSet for Status CRUD REST Service that inherits from utils.GenericViewSet
+    """
+    obj_class = models.Status
+    queryset = models.Status.objects.filter(is_active=True)
+    serializer_class = serializers.StatusSerializer
+    filter_class = works_filters.StatusFilter
+
+
 class WorkViewSet(utils.GenericViewSet):
     """ViewSet for Work CRUD REST Service that inherits from utils.GenericViewSet
     """

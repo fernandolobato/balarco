@@ -35,6 +35,12 @@ class ArtIgualaFilter(django_filters.rest_framework.FilterSet):
         fields = ['id', 'iguala', 'art_type', 'quantity']
 
 
+class StatusFilter(django_filters.rest_framework.FilterSet):
+    class Meta:
+        model = works_models.Status
+        fields = ['id', 'status_id']
+
+
 class WorkFilter(django_filters.rest_framework.FilterSet):
     class Meta:
         model = works_models.Work
