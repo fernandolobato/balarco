@@ -220,6 +220,7 @@ class WorkViewSet(utils.GenericViewSet):
                                                             active_work=True)
                     except models.WorkDesigner.DoesNotExist:
                         update_work_designer = None
+
                     if update_work_designer is not None:
                         if not utils.update_object_from_data(serializers.WorkDesignerSerializer,
                                                              update_work_designer,
