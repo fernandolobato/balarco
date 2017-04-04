@@ -318,6 +318,59 @@ class ArtIgualaAPITest(utils.GenericAPITest):
         self.factory = APIRequestFactory()
 
 
+class StatusAPITest(utils.GenericAPITest):
+    """Tests to verify the basic usage of the REST API to create, modify and list status.
+    It inherits from utils.GenericAPITest and add the necessary class attributes.
+    """
+    def setUp(self):
+        self.user = User.objects.create_user(username='test_user',
+                                             password='test_password')
+        url = reverse('users:api_login')
+        data = {'username': 'test_user', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
+
+        self.obj_class = models.Status
+        self.serializer_class = serializers.StatusSerializer
+
+        status_1 = models.Status.objects.create(
+            status_id=0)
+        status_2 = models.Status.objects.create(
+            status_id=1)
+        status_3 = models.Status.objects.create(
+            status_id=2)
+
+        self.test_objects = [status_1, status_2, status_3]
+        self.number_of_initial_objects = len(self.test_objects)
+
+        self.data_creation_test = {
+            'status_id': 3,
+            }
+
+        self.data_filtering_test = {
+            'status_id': 1,
+        }
+
+        self.number_of_filtered_objects = 1
+
+        self.data_edition_test = {
+            'status_id': 4,
+            }
+
+        self.edition_obj_idx = 0
+
+        self.view = views.StatusViewSet.as_view({
+                                'get': 'list',
+                                'post': 'create',
+                                'put': 'update',
+                                'patch': 'partial_update',
+                                'delete': 'destroy'
+                                })
+
+        self.url_list = 'works:status-list'
+        self.url_detail = 'works:status-detail'
+        self.factory = APIRequestFactory()
+
+
 class WorkAPITest(utils.GenericAPITest):
     """Tests to verify the basic usage of the REST API to create, modify and list arts from a work.
     It inherits from utils.GenericAPITest and add the necessary class attributes.
