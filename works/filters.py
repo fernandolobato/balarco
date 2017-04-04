@@ -11,13 +11,16 @@ from . import models as works_models
 class WorkTypeFilter(django_filters.rest_framework.FilterSet):
     class Meta:
         model = works_models.WorkType
-        fields = ['id', 'name']
+        fields = ['id', 'work_type_id', 'name']
 
 
 class ArtTypeFilter(django_filters.rest_framework.FilterSet):
+
+    work_work_type_id = django_filters.NumberFilter(name='work_type__work_type_id')
+
     class Meta:
         model = works_models.ArtType
-        fields = ['id', 'work_type', 'name']
+        fields = ['id', 'work_type', 'name', 'work_work_type_id']
 
 
 class IgualaFilter(django_filters.rest_framework.FilterSet):
@@ -30,6 +33,12 @@ class ArtIgualaFilter(django_filters.rest_framework.FilterSet):
     class Meta:
         model = works_models.ArtIguala
         fields = ['id', 'iguala', 'art_type', 'quantity']
+
+
+class StatusFilter(django_filters.rest_framework.FilterSet):
+    class Meta:
+        model = works_models.Status
+        fields = ['id', 'status_id']
 
 
 class WorkFilter(django_filters.rest_framework.FilterSet):

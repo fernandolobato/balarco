@@ -21,11 +21,24 @@ class WorkType(models.Model):
     name: CharField
         Name of the work type.
     """
+    ID_PROJECT = 0
+    ID_IGUALA = 1
+    ID_GRADUATION = 2
+    IDS = (
+        (ID_PROJECT, 'Proyecto'),
+        (ID_IGUALA, 'Iguala'),
+        (ID_GRADUATION, 'Graduación'),
+    )
+    work_type_id = models.IntegerField(choices=IDS)
     name = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return '{}'.format(self.name)
+
+    def save(self, *args, **kwargs):
+        self.name = self.IDS[self.work_type_id][1]
+        super(WorkType, self).save(*args, **kwargs)
 
 
 class ArtType(models.Model):
@@ -324,6 +337,7 @@ class File(models.Model):
     """
     work = models.ForeignKey(Work, related_name='files', on_delete=models.CASCADE)
 
+    filename = models.CharField(max_length=300)
     upload = models.FileField(upload_to='work_files/')
     is_active = models.BooleanField(default=True)
 
@@ -379,7 +393,7 @@ class StatusChange(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return '{} - {} - {}'.format(self.work, self.status, self.date)
+        return '{} - {} - {} - {}'.format(self.user, self.work, self.status, self.date)
 
     def save(self, *args, **kwargs):
         self.date = timezone.now()
