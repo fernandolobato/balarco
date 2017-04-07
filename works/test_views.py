@@ -25,21 +25,27 @@ class WorkTypeAPITest(utils.GenericAPITest):
         self.serializer_class = serializers.WorkTypeSerializer
 
         work_type_proyecto = models.WorkType.objects.create(
-            name='Proyecto')
+            work_type_id=0)
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         self.test_objects = [work_type_proyecto, work_type_graduacion, work_type_iguala]
         self.number_of_initial_objects = len(self.test_objects)
 
         self.data_creation_test = {
-            'name': 'Work type 4',
+            'work_type_id': 2,
             }
 
+        self.data_filtering_test = {
+            'name': 'Proyecto',
+        }
+
+        self.number_of_filtered_objects = 1
+
         self.data_edition_test = {
-            'name': 'Proyectos',
+            'work_type_id': 2,
             }
 
         self.edition_obj_idx = 0
@@ -72,9 +78,9 @@ class ArtTypeAPITest(utils.GenericAPITest):
         self.serializer_class = serializers.ArtTypeSerializer
 
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         art_type_arte_complejo = models.ArtType.objects.create(
             name='Arte complejo',
@@ -95,6 +101,12 @@ class ArtTypeAPITest(utils.GenericAPITest):
             'name': 'Work type 4',
             'work_type': work_type_graduacion.id
             }
+
+        self.data_filtering_test = {
+            'name': 'Invitación',
+        }
+
+        self.number_of_filtered_objects = 1
 
         self.data_edition_test = {
             'name': 'Arte complejo 2',
@@ -152,6 +164,27 @@ class IgualaAPITest(utils.GenericAPITest):
             start_date=datetime.date.today(),
             end_date=datetime.date.today())
 
+        work_type_iguala = models.WorkType.objects.create(
+            work_type_id=2)
+
+        art_type_arte_complejo = models.ArtType.objects.create(
+            name='Arte complejo',
+            work_type=work_type_iguala)
+
+        art_type_arte_abstracto = models.ArtType.objects.create(
+            name='Arte abstracto',
+            work_type=work_type_iguala)
+
+        art_iguala1 = {
+            'art_type': art_type_arte_complejo.id,
+            'quantity': 50
+        }
+
+        art_iguala2 = {
+            'art_type': art_type_arte_abstracto.id,
+            'quantity': 80
+        }
+
         self.test_objects = [iguala_starbucks, iguala_oxxo]
         self.number_of_initial_objects = len(self.test_objects)
 
@@ -159,14 +192,22 @@ class IgualaAPITest(utils.GenericAPITest):
             'client': client_oxxo.id,
             'name': 'Iguala Oxxo 2',
             'start_date': datetime.date.today(),
-            'end_date': datetime.date.today()
+            'end_date': datetime.date.today(),
+            'art_iguala': [art_iguala1, art_iguala2]
             }
+
+        self.data_filtering_test = {
+            'name': 'Iguala Oxxo',
+        }
+
+        self.number_of_filtered_objects = 1
 
         self.data_edition_test = {
             'client': client_oxxo.id,
             'name': 'Iguala Oxxo 1',
             'start_date': datetime.date.today(),
-            'end_date': datetime.date.today()
+            'end_date': datetime.date.today(),
+            'art_iguala': [art_iguala1, art_iguala2]
             }
 
         self.edition_obj_idx = 1
@@ -221,7 +262,7 @@ class ArtIgualaAPITest(utils.GenericAPITest):
             end_date=datetime.date.today())
 
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         art_type_arte_complejo = models.ArtType.objects.create(
             name='Arte complejo',
@@ -250,6 +291,12 @@ class ArtIgualaAPITest(utils.GenericAPITest):
             'quantity': 20
             }
 
+        self.data_filtering_test = {
+            'quantity': 50,
+        }
+
+        self.number_of_filtered_objects = 1
+
         self.data_edition_test = {
             'iguala': iguala_oxxo.id,
             'art_type': art_type_arte_abstracto.id,
@@ -268,6 +315,59 @@ class ArtIgualaAPITest(utils.GenericAPITest):
 
         self.url_list = 'works:art_igualas-list'
         self.url_detail = 'works:art_igualas-detail'
+        self.factory = APIRequestFactory()
+
+
+class StatusAPITest(utils.GenericAPITest):
+    """Tests to verify the basic usage of the REST API to create, modify and list status.
+    It inherits from utils.GenericAPITest and add the necessary class attributes.
+    """
+    def setUp(self):
+        self.user = User.objects.create_user(username='test_user',
+                                             password='test_password')
+        url = reverse('users:api_login')
+        data = {'username': 'test_user', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
+
+        self.obj_class = models.Status
+        self.serializer_class = serializers.StatusSerializer
+
+        status_1 = models.Status.objects.create(
+            status_id=0)
+        status_2 = models.Status.objects.create(
+            status_id=1)
+        status_3 = models.Status.objects.create(
+            status_id=2)
+
+        self.test_objects = [status_1, status_2, status_3]
+        self.number_of_initial_objects = len(self.test_objects)
+
+        self.data_creation_test = {
+            'status_id': 3,
+            }
+
+        self.data_filtering_test = {
+            'status_id': 1,
+        }
+
+        self.number_of_filtered_objects = 1
+
+        self.data_edition_test = {
+            'status_id': 4,
+            }
+
+        self.edition_obj_idx = 0
+
+        self.view = views.StatusViewSet.as_view({
+                                'get': 'list',
+                                'post': 'create',
+                                'put': 'update',
+                                'patch': 'partial_update',
+                                'delete': 'destroy'
+                                })
+
+        self.url_list = 'works:status-list'
+        self.url_detail = 'works:status-detail'
         self.factory = APIRequestFactory()
 
 
@@ -321,9 +421,9 @@ class WorkAPITest(utils.GenericAPITest):
             end_date=datetime.date.today())
 
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         status_pendiente = models.Status.objects.create(
             status_id=models.Status.STATUS_PENDIENTE)
@@ -351,6 +451,39 @@ class WorkAPITest(utils.GenericAPITest):
         self.test_objects = [work_iguala_starbucks, work_graduacion_oxxo]
         self.number_of_initial_objects = len(self.test_objects)
 
+        art_type_arte_complejo = models.ArtType.objects.create(
+            name='Arte complejo',
+            work_type=work_type_iguala)
+        art_type_arte_abstracto = models.ArtType.objects.create(
+            name='Arte abstracto',
+            work_type=work_type_iguala)
+        art_type_invitacion = models.ArtType.objects.create(
+            name='Invitación',
+            work_type=work_type_graduacion)
+        art_type_menu = models.ArtType.objects.create(
+            name='Menú',
+            work_type=work_type_graduacion)
+
+        art_work1 = {
+            'art_type': art_type_arte_complejo.id,
+            'quantity': 300
+            }
+
+        art_work2 = {
+            'art_type': art_type_arte_abstracto.id,
+            'quantity': 200
+            }
+
+        art_work3 = {
+            'art_type': art_type_invitacion.id,
+            'quantity': 100
+            }
+
+        art_work4 = {
+            'art_type': art_type_menu.id,
+            'quantity': 50
+            }
+
         self.data_creation_test = {
             'executive': self.user.id,
             'contact': contact_instance_julian.id,
@@ -358,13 +491,26 @@ class WorkAPITest(utils.GenericAPITest):
             'work_type': work_type_graduacion.id,
             'name': 'Work graduacion starbucks',
             'expected_delivery_date': '2017-05-18',
-            'brief': 'Brief3'
+            'brief': 'Brief3',
+            'art_works': [art_work1, art_work2, art_work3, art_work4]
+            }
+
+        self.data_filtering_test = {
+            'contact': contact_instance_julian.id,
+        }
+
+        self.number_of_filtered_objects = 1
+
+        work_designer1 = {
+            'designer': self.user.id,
+            'active_work': True
             }
 
         self.data_edition_test = {
             'name': 'Work graduacion starbucks',
             'expected_delivery_date': '2017-08-20',
-            'brief': 'Brief2 edited'
+            'brief': 'Brief2 edited',
+            'work_designers': [work_designer1]
             }
 
         self.edition_obj_idx = 1
@@ -432,9 +578,9 @@ class ArtWorkAPITest(utils.GenericAPITest):
             end_date=datetime.date.today())
 
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         art_type_arte_complejo = models.ArtType.objects.create(
             name='Arte complejo',
@@ -493,6 +639,12 @@ class ArtWorkAPITest(utils.GenericAPITest):
             'art_type': art_type_menu.id,
             'quantity': 300
             }
+
+        self.data_filtering_test = {
+            'art_type': art_type_invitacion.id,
+        }
+
+        self.number_of_filtered_objects = 1
 
         self.data_edition_test = {
             'quantity': 300
@@ -563,9 +715,9 @@ class FileAPITest(utils.GenericAPITest):
             end_date=datetime.date.today())
 
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         status_pendiente = models.Status.objects.create(
             status_id=models.Status.STATUS_PENDIENTE)
@@ -594,9 +746,11 @@ class FileAPITest(utils.GenericAPITest):
         file2 = SimpleUploadedFile("file2.txt", b"file_content")
         file_instance_1 = models.File.objects.create(
             work=work_iguala_starbucks,
+            filename='File1',
             upload=file1)
         file_instance_2 = models.File.objects.create(
             work=work_graduacion_oxxo,
+            filename='File2',
             upload=file2)
 
         self.test_objects = [file_instance_1, file_instance_2]
@@ -605,8 +759,15 @@ class FileAPITest(utils.GenericAPITest):
         file3 = SimpleUploadedFile("file3.txt", b"file_content")
         self.data_creation_test = {
             'work': work_iguala_starbucks.id,
+            'filename': 'File3',
             'upload': file3.file,
             }
+
+        self.data_filtering_test = {
+            'work': work_iguala_starbucks.id,
+        }
+
+        self.number_of_filtered_objects = 1
 
         self.data_edition_test = {
             'work': work_graduacion_oxxo.id
@@ -685,9 +846,9 @@ class WorkDesignerAPITest(utils.GenericAPITest):
             end_date=datetime.date.today())
 
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         status_pendiente = models.Status.objects.create(
             status_id=models.Status.STATUS_PENDIENTE)
@@ -729,6 +890,12 @@ class WorkDesignerAPITest(utils.GenericAPITest):
             'work': work_graduacion_oxxo.id,
             'active_work': True
             }
+
+        self.data_filtering_test = {
+            'designer': designer2.id,
+        }
+
+        self.number_of_filtered_objects = 1
 
         self.data_edition_test = {
             'designer': designer2.id,
@@ -805,9 +972,9 @@ class StatusChangeAPITest(utils.GenericAPITest):
             end_date=datetime.date.today())
 
         work_type_graduacion = models.WorkType.objects.create(
-            name='Graduación')
+            work_type_id=1)
         work_type_iguala = models.WorkType.objects.create(
-            name='Iguala')
+            work_type_id=2)
 
         status_pendiente = models.Status.objects.create(
             status_id=models.Status.STATUS_PENDIENTE)
@@ -849,6 +1016,12 @@ class StatusChangeAPITest(utils.GenericAPITest):
             'status': status_diseno.id,
             'user': designer2.id
             }
+
+        self.data_filtering_test = {
+            'work': work_iguala_starbucks.id,
+        }
+
+        self.number_of_filtered_objects = 1
 
         self.data_edition_test = {
             'status': status_pendiente.id,
