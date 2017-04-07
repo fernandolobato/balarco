@@ -216,13 +216,24 @@ class Work(models.Model):
         if self.pk is None:
             return possible_status_ids
 
+        if user.groups.filter(name=utils.GROUP_SUPERUSUARIO).exists():
+            possible_status_ids.add(Status.STATUS_PENDIENTE)
+            possible_status_ids.add(Status.STATUS_DISENO)
+            possible_status_ids.add(Status.STATUS_CUENTAS)
+            possible_status_ids.add(Status.STATUS_VALIDACION)
+            possible_status_ids.add(Status.STATUS_PRODUCCION)
+            possible_status_ids.add(Status.STATUS_POR_COBRAR)
+            possible_status_ids.add(Status.STATUS_POR_FACTURAR)
+            possible_status_ids.add(Status.STATUS_TERMINADO)
+            possible_status_ids.add(Status.STATUS_CANCELADO)
+
         if self.current_status.status_id == Status.STATUS_PENDIENTE:
             if user.groups.filter(name=utils.GROUP_DIR_CUENTAS).exists():
                 possible_status_ids.add(Status.STATUS_PENDIENTE)
                 possible_status_ids.add(Status.STATUS_DISENO)
                 possible_status_ids.add(Status.STATUS_CANCELADO)
 
-            if user.groups.filter(name=utils.GROUP_EJECUTIVO).exists():
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO_SR).exists():
                 possible_status_ids.add(Status.STATUS_PENDIENTE)
                 possible_status_ids.add(Status.STATUS_DISENO)
                 possible_status_ids.add(Status.STATUS_CANCELADO)
@@ -243,7 +254,7 @@ class Work(models.Model):
                 possible_status_ids.add(Status.STATUS_VALIDACION)
                 possible_status_ids.add(Status.STATUS_CANCELADO)
 
-            if user.groups.filter(name=utils.GROUP_EJECUTIVO):
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO_SR):
                 possible_status_ids.add(Status.STATUS_CUENTAS)
                 possible_status_ids.add(Status.STATUS_DISENO)
                 possible_status_ids.add(Status.STATUS_VALIDACION)
@@ -258,7 +269,7 @@ class Work(models.Model):
                 possible_status_ids.add(Status.STATUS_POR_COBRAR)
                 possible_status_ids.add(Status.STATUS_CANCELADO)
 
-            if user.groups.filter(name=utils.GROUP_EJECUTIVO):
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO_SR):
                 possible_status_ids.add(Status.STATUS_VALIDACION)
                 possible_status_ids.add(Status.STATUS_CUENTAS)
                 possible_status_ids.add(Status.STATUS_DISENO)
@@ -273,28 +284,29 @@ class Work(models.Model):
                 possible_status_ids.add(Status.STATUS_POR_COBRAR)
                 possible_status_ids.add(Status.STATUS_CANCELADO)
 
-            if user.groups.filter(name=utils.GROUP_EJECUTIVO):
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO_SR):
                 possible_status_ids.add(Status.STATUS_PRODUCCION)
                 possible_status_ids.add(Status.STATUS_DISENO)
                 possible_status_ids.add(Status.STATUS_POR_COBRAR)
                 possible_status_ids.add(Status.STATUS_CANCELADO)
 
         elif self.current_status.status_id == Status.STATUS_POR_COBRAR:
-            pass
+            if user.groups.filter(name=utils.GROUP_ADMINISTRACION):
+                possible_status_ids.add(Status.STATUS_POR_COBRAR)
+                possible_status_ids.add(Status.STATUS_POR_FACTURAR)
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+                possible_status_ids.add(Status.STATUS_TERMINADO)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
 
         elif self.current_status.status_id == Status.STATUS_POR_FACTURAR:
-            pass
+            if user.groups.filter(name=utils.GROUP_ADMINISTRACION):
+                possible_status_ids.add(Status.STATUS_POR_FACTURAR)
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+                possible_status_ids.add(Status.STATUS_TERMINADO)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
 
         elif self.current_status.status_id == Status.STATUS_TERMINADO:
             pass
-
-        else:
-            if user.groups.filter(name=utils.GROUP_DIR_CUENTAS).exists():
-                possible_status_ids.add(Status.STATUS_PENDIENTE)
-                possible_status_ids.add(Status.STATUS_DISENO)
-            if user.groups.filter(name=utils.GROUP_EJECUTIVO).exists():
-                possible_status_ids.add(Status.STATUS_PENDIENTE)
-                possible_status_ids.add(Status.STATUS_DISENO)
 
         return possible_status_ids
 
