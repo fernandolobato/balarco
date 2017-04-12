@@ -8,13 +8,14 @@ from rest_framework.test import APITestCase, APIRequestFactory, force_authentica
 from rest_framework.authtoken.models import Token
 
 
+GROUP_SUPERUSUARIO = "Super usuario"
 GROUP_DIR_CUENTAS = "Director de cuentas"
-GROUP_EJECUTIVO = "Ejecutivo"
-GROUP_VENTAS = "Ventas"
+GROUP_EJECUTIVO_SR = "Ejecutivo SR"
+GROUP_EJECUTIVO_JR = "Ejecutivo JR"
+GROUP_ADMINISTRACION = "Administración"
 GROUP_DIR_ARTE = "Director de arte"
 GROUP_DISENADOR_SR = "Diseñador SR"
 GROUP_DISENADOR_JR = "Diseñador JR"
-GROUP_SUPERUSUARIO = "Super usuario"
 
 
 def save_object_from_data(obj_class, serializer_class, data):

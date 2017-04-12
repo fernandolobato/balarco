@@ -26,7 +26,6 @@ class UserViewSet(utils.GenericViewSet):
             for group in groups:
                 group_id = group['id']
                 current_group = Group.objects.get(id=group_id)
-                print(current_group)
                 current_group.user_set.add(new_user)
                 selected_groups.append(group_id)
                 current_group.save()
@@ -35,7 +34,6 @@ class UserViewSet(utils.GenericViewSet):
                 group.user_set.remove(new_user)
                 group.save()
             return Response(self.serializer_class(new_user).data, status.HTTP_201_CREATED)
-
         else:
             return utils.response_object_could_not_be_created(self.obj_class)
 
@@ -52,7 +50,6 @@ class UserViewSet(utils.GenericViewSet):
             for group in groups:
                 group_id = group['id']
                 current_group = Group.objects.get(id=group_id)
-                print(current_group)
                 current_group.user_set.add(updated_user)
                 selected_groups.append(group_id)
                 current_group.save()
@@ -60,6 +57,9 @@ class UserViewSet(utils.GenericViewSet):
             for group in unselected_groups:
                 group.user_set.remove(updated_user)
                 group.save()
+            return Response(self.serializer_class(updated_user).data, status.HTTP_200_OK)
+        else:
+            return utils.response_object_could_not_be_created(self.obj_class)
 
     def partial_update(self, request, pk=None):
         return self.update(request, pk)
