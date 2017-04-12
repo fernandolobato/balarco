@@ -10,11 +10,11 @@ from django.contrib.auth.models import User, Group
 
 class UserFilter(django_filters.rest_framework.FilterSet):
 
-    user_group_name = django_filters.CharFilter(name='groups__name')
+    groups_name = django_filters.CharFilter(name='groups__name')
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'groups', 'user_group_name']
+        fields = ['id', 'username', 'first_name', 'last_name', 'groups', 'groups_name']
 
 
 class GroupFilter(django_filters.rest_framework.FilterSet):
