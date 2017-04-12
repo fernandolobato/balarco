@@ -125,6 +125,12 @@ class UserAPITest(utils.GenericAPITest):
             'password': 'new_user_password',
             }
 
+        self.data_filtering_test = {
+            'username': 'marcoantonio@example.com',
+        }
+
+        self.number_of_filtered_objects = 1
+
         self.data_edition_test = {
             'username': 'different_address@example.com',
             }
@@ -142,6 +148,3 @@ class UserAPITest(utils.GenericAPITest):
         self.url_list = 'users:users-list'
         self.url_detail = 'users:users-detail'
         self.factory = APIRequestFactory()
-
-    def test_filters(self):
-        pass
