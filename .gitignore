@@ -90,3 +90,7 @@ ENV/
 
 #Images
 media/
+
+
+# Dumps
+*.rdb
