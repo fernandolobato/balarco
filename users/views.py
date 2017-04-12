@@ -71,3 +71,4 @@ class GroupViewSet(utils.GenericViewSet):
     obj_class = Group
     queryset = Group.objects.all()
     serializer_class = serializers.GroupSerializer
+    filter_class = users_filters.GroupFilter
