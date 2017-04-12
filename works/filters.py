@@ -42,10 +42,20 @@ class StatusFilter(django_filters.rest_framework.FilterSet):
 
 
 class WorkFilter(django_filters.rest_framework.FilterSet):
+
+    creation_date_min = django_filters.DateFilter(name='creation_date', lookup_expr='gte')
+    creation_date_max = django_filters.DateFilter(name='creation_date', lookup_expr='lte')
+    expected_delivery_date_min = django_filters.DateFilter(name='expected_delivery_date',
+                                                           lookup_expr='gte')
+    expected_delivery_date_max = django_filters.DateFilter(name='expected_delivery_date',
+                                                           lookup_expr='lte')
+
     class Meta:
         model = works_models.Work
         fields = ['id', 'executive', 'contact', 'current_status', 'work_type', 'iguala',
-                  'creation_date', 'name', 'expected_delivery_date', 'brief', 'final_link']
+                  'creation_date', 'name', 'expected_delivery_date', 'brief', 'final_link',
+                  'creation_date_min', 'creation_date_max', 'expected_delivery_date_min',
+                  'expected_delivery_date_max']
 
 
 class ArtWorkFilter(django_filters.rest_framework.FilterSet):
