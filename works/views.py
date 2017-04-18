@@ -1,8 +1,11 @@
+import csv
+
 from rest_framework.decorators import detail_route
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
+from django.http import HttpResponse
 
 from . import models, serializers
 from . import filters as works_filters
@@ -98,6 +101,19 @@ class IgualaViewSet(utils.GenericViewSet):
 
     def partial_update(self, request, pk=None):
         return self.update(request, pk)
+
+    @detail_route(methods=['get'], url_path='report')
+    def report(self, request, pk=None):
+        queryset = models.Iguala.objects.filter(is_active=True)
+        iguala = get_object_or_404(queryset, pk=pk)
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(iguala.name)
+
+        writer = csv.writer(response)
+        writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
+        writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])
+
+        return response
 
 
 class ArtIgualaViewSet(utils.GenericViewSet):
