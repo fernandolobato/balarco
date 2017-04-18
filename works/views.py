@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
 from django.http import HttpResponse
+from django.utils import timezone
 
 from . import models, serializers
 from . import filters as works_filters
@@ -107,7 +108,9 @@ class IgualaViewSet(utils.GenericViewSet):
         queryset = models.Iguala.objects.filter(is_active=True)
         iguala = get_object_or_404(queryset, pk=pk)
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(iguala.name)
+        str_now = timezone.now().strftime('%Y-%m-%d %H-%M')
+        response['Content-Disposition'] = 'attachment; filename="{}-{}.csv"'.format(iguala.name,
+                                                                                    str_now)
 
         writer = csv.writer(response)
         writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
