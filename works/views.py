@@ -128,7 +128,7 @@ class IgualaViewSet(utils.GenericViewSet):
                     art_works_count[art_type_id] = art_work.quantity
 
         writer.writerow(['Tipo de arte', 'Contratadas', 'Usadas', 'Restantes'])
-        
+
         for art_iguala in iguala.art_iguala.all():
             art_type_id = art_iguala.art_type.id
             art_type_name = art_iguala.art_type.name
@@ -149,9 +149,6 @@ class IgualaViewSet(utils.GenericViewSet):
                     art_works_count[art_type_id] += art_work.quantity
                 else:
                     art_works_count[art_type_id] = art_work.quantity
-
-        writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
-        writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])
 
         return response
 
