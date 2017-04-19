@@ -108,14 +108,15 @@ class IgualaViewSet(utils.GenericViewSet):
         queryset = models.Iguala.objects.filter(is_active=True)
         iguala = get_object_or_404(queryset, pk=pk)
         response = HttpResponse(content_type='text/csv')
-        str_now = timezone.now().strftime('%Y-%m-%d %H-%M')
+        str_now = timezone.now().strftime('%d-%m-%Y %H-%M')
         response['Content-Disposition'] = 'attachment; filename="{}-{}.csv"'.format(iguala.name,
                                                                                     str_now)
 
         works = models.Work.objects.filter(is_active=True, iguala=iguala)
         writer = csv.writer(response)
 
-        writer.writerow([iguala.name, timezone.now().strftime('%Y-%m-%d %H:%M')])
+        writer.writerow([iguala.name, timezone.now().strftime('%d-%m-%Y %H:%M')])
+        writer.writerow([])
         writer.writerow([])
 
         art_works_count = {}
@@ -142,13 +143,26 @@ class IgualaViewSet(utils.GenericViewSet):
                 remaining = agreed - used
                 writer.writerow([art_type_name, agreed, used, remaining])
 
+        writer.writerow([])
+        writer.writerow([])
+        writer.writerow(['Trabajos relacionados con la iguala'])
+
         for work in works:
+            writer.writerow([])
+            writer.writerow([])
+            writer.writerow(['Trabajo', 'Contacto', 'Empresa', 'Fecha entrada', 'Status actual'])
+            work_name = work.name
+            contact_name = '{} {}'.format(work.contact.name, work.contact.last_name)
+            client_name = work.contact.client.name
+            creation_date = work.creation_date.strftime('%d-%m-%Y')
+            current_status = work.current_status.__str__()
+            writer.writerow([work_name, contact_name, client_name, creation_date, current_status])
+            writer.writerow([])
+            writer.writerow(['', 'Tipo de arte', 'Cantidad'])
             for art_work in work.art_works.all():
-                art_type_id = art_work.art_type.id
-                if art_type_id in art_works_count:
-                    art_works_count[art_type_id] += art_work.quantity
-                else:
-                    art_works_count[art_type_id] = art_work.quantity
+                art_type_name = art_work.art_type.name
+                quantity = art_work.quantity
+                writer.writerow(['', art_type_name, quantity])
 
         return response
 
