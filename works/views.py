@@ -112,7 +112,44 @@ class IgualaViewSet(utils.GenericViewSet):
         response['Content-Disposition'] = 'attachment; filename="{}-{}.csv"'.format(iguala.name,
                                                                                     str_now)
 
+        works = models.Work.objects.filter(is_active=True, iguala=iguala)
         writer = csv.writer(response)
+
+        writer.writerow([iguala.name, timezone.now().strftime('%Y-%m-%d %H:%M')])
+        writer.writerow([])
+
+        art_works_count = {}
+        for work in works:
+            for art_work in work.art_works.all():
+                art_type_id = art_work.art_type.id
+                if art_type_id in art_works_count:
+                    art_works_count[art_type_id] += art_work.quantity
+                else:
+                    art_works_count[art_type_id] = art_work.quantity
+
+        writer.writerow(['Tipo de arte', 'Contratadas', 'Usadas', 'Restantes'])
+        
+        for art_iguala in iguala.art_iguala.all():
+            art_type_id = art_iguala.art_type.id
+            art_type_name = art_iguala.art_type.name
+            agreed = art_iguala.quantity
+            if art_type_id in art_works_count:
+                used = art_works_count[art_type_id]
+                remaining = agreed - used
+                writer.writerow([art_type_name, agreed, used, remaining])
+            else:
+                used = 0
+                remaining = agreed - used
+                writer.writerow([art_type_name, agreed, used, remaining])
+
+        for work in works:
+            for art_work in work.art_works.all():
+                art_type_id = art_work.art_type.id
+                if art_type_id in art_works_count:
+                    art_works_count[art_type_id] += art_work.quantity
+                else:
+                    art_works_count[art_type_id] = art_work.quantity
+
         writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
         writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])
 
