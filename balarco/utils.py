@@ -17,6 +17,17 @@ GROUP_DIR_ARTE = "Director de arte"
 GROUP_DISENADOR_SR = "Diseñador SR"
 GROUP_DISENADOR_JR = "Diseñador JR"
 
+GROUPS = (
+    (GROUP_SUPERUSUARIO, GROUP_SUPERUSUARIO),
+    (GROUP_DIR_CUENTAS, GROUP_DIR_CUENTAS),
+    (GROUP_EJECUTIVO_SR, GROUP_EJECUTIVO_SR),
+    (GROUP_EJECUTIVO_JR, GROUP_EJECUTIVO_JR),
+    (GROUP_ADMINISTRACION, GROUP_ADMINISTRACION),
+    (GROUP_DIR_ARTE, GROUP_DIR_ARTE),
+    (GROUP_DISENADOR_SR, GROUP_DISENADOR_SR),
+    (GROUP_DISENADOR_JR, GROUP_DISENADOR_JR)
+    )
+
 
 def save_object_from_data(obj_class, serializer_class, data):
     obj_serializer = serializer_class(data=data)

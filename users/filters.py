@@ -7,14 +7,16 @@ convinience.
 import django_filters
 from django.contrib.auth.models import User, Group
 
+from balarco import utils
+
 
 class UserFilter(django_filters.rest_framework.FilterSet):
 
-    groups_name = django_filters.CharFilter(name='groups__name')
+    group_name = django_filters.MultipleChoiceFilter(name='groups__name', choices=utils.GROUPS)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'groups', 'groups_name']
+        fields = ['id', 'username', 'first_name', 'last_name', 'groups', 'group_name']
 
 
 class GroupFilter(django_filters.rest_framework.FilterSet):
