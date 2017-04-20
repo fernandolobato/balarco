@@ -1,8 +1,12 @@
+import csv
+
 from rest_framework.decorators import detail_route
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
+from django.http import HttpResponse
+from django.utils import timezone
 
 from . import models, serializers
 from . import filters as works_filters
@@ -98,6 +102,69 @@ class IgualaViewSet(utils.GenericViewSet):
 
     def partial_update(self, request, pk=None):
         return self.update(request, pk)
+
+    @detail_route(methods=['get'], url_path='report')
+    def report(self, request, pk=None):
+        queryset = models.Iguala.objects.filter(is_active=True)
+        iguala = get_object_or_404(queryset, pk=pk)
+        response = HttpResponse(content_type='text/csv')
+        str_now = timezone.now().strftime('%d-%m-%Y %H-%M')
+        response['Content-Disposition'] = 'attachment; filename="{}-{}.csv"'.format(iguala.name,
+                                                                                    str_now)
+
+        works = models.Work.objects.filter(is_active=True, iguala=iguala)
+        writer = csv.writer(response)
+
+        writer.writerow([iguala.name, timezone.now().strftime('%d-%m-%Y %H:%M')])
+        writer.writerow([])
+        writer.writerow([])
+
+        art_works_count = {}
+        for work in works:
+            for art_work in work.art_works.all():
+                art_type_id = art_work.art_type.id
+                if art_type_id in art_works_count:
+                    art_works_count[art_type_id] += art_work.quantity
+                else:
+                    art_works_count[art_type_id] = art_work.quantity
+
+        writer.writerow(['Tipo de arte', 'Contratadas', 'Usadas', 'Restantes'])
+
+        for art_iguala in iguala.art_iguala.all():
+            art_type_id = art_iguala.art_type.id
+            art_type_name = art_iguala.art_type.name
+            agreed = art_iguala.quantity
+            if art_type_id in art_works_count:
+                used = art_works_count[art_type_id]
+                remaining = agreed - used
+                writer.writerow([art_type_name, agreed, used, remaining])
+            else:
+                used = 0
+                remaining = agreed - used
+                writer.writerow([art_type_name, agreed, used, remaining])
+
+        writer.writerow([])
+        writer.writerow([])
+        writer.writerow(['Trabajos relacionados con la iguala'])
+
+        for work in works:
+            writer.writerow([])
+            writer.writerow([])
+            writer.writerow(['Trabajo', 'Contacto', 'Empresa', 'Fecha entrada', 'Status actual'])
+            work_name = work.name
+            contact_name = '{} {}'.format(work.contact.name, work.contact.last_name)
+            client_name = work.contact.client.name
+            creation_date = work.creation_date.strftime('%d-%m-%Y')
+            current_status = work.current_status.__str__()
+            writer.writerow([work_name, contact_name, client_name, creation_date, current_status])
+            writer.writerow([])
+            writer.writerow(['', 'Tipo de arte', 'Cantidad'])
+            for art_work in work.art_works.all():
+                art_type_name = art_work.art_type.name
+                quantity = art_work.quantity
+                writer.writerow(['', art_type_name, quantity])
+
+        return response
 
 
 class ArtIgualaViewSet(utils.GenericViewSet):
