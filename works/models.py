@@ -444,6 +444,10 @@ class Notification(models.Model):
         Relation with the user.
     date: DateTimeField
         Date when the notification was created.
+    text: CharField
+        Text of the notification.
+    seen: BooleanField
+        Boolean that represents if the notification has been seen by the user.
     """
     work = models.ForeignKey(Work, related_name='notifications', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='notifications', on_delete=models.CASCADE)
