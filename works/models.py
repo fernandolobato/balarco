@@ -205,6 +205,7 @@ class Work(models.Model):
     def save(self, *args, **kwargs):
         if self.pk is None:
             self.creation_date = datetime.date.today()
+        self.get_related_users()
         self.send_notification()
         super(Work, self).save(*args, **kwargs)
 
@@ -313,6 +314,16 @@ class Work(models.Model):
     def get_possible_status_changes(self, user):
         possible_status_ids = self.get_possible_status_ids(user)
         return Status.objects.filter(status_id__in=possible_status_ids)
+
+    def get_related_users(self):
+        work_designers = [work_designer.designer for work_designer in self.work_designers.all()
+                          if work_designer.active_work]
+        executive = [self.executive]
+        related_users = set()
+        related_users_list = work_designers + executive
+        for related_user in related_users_list:
+            related_users.add(related_user)
+        return related_users
 
 
 class ArtWork(models.Model):
