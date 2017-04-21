@@ -415,6 +415,8 @@ class StatusChange(models.Model):
         Relation with the work.
     status: ForeignKey
         Relation with the Status model that indicates the status in that date.
+    user: ForeignKey
+        Relation with the user.
     """
     work = models.ForeignKey(Work, related_name='status_changes', on_delete=models.CASCADE)
     status = models.ForeignKey(Status, related_name='status_changes', on_delete=models.CASCADE)
@@ -429,3 +431,31 @@ class StatusChange(models.Model):
     def save(self, *args, **kwargs):
         self.date = timezone.now()
         super(StatusChange, self).save(*args, **kwargs)
+
+
+class Notification(models.Model):
+    """ Model that represents a notification related to a work.
+
+    Attributes:
+    -----------
+    work: ForeignKey
+        Relation with the work.
+    user: ForeignKey
+        Relation with the user.
+    date: DateTimeField
+        Date when the notification was created.
+    """
+    work = models.ForeignKey(Work, related_name='notifications', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='notifications', on_delete=models.CASCADE)
+
+    date = models.DateTimeField(blank=True, null=True)
+    text = models.CharField(max_length=2000)
+    seen = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return '{} - {} - {} - {}'.format(self.work, self.user, self.date, self.text)
+
+    def save(self, *args, **kwargs):
+        self.date = timezone.now()
+        super(Notification, self).save(*args, **kwargs)
