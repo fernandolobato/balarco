@@ -12,8 +12,8 @@ from works.consumers import connect_work, disconnect_work
 channel_routing = [
     # @TODO: Correct urls
     # Called when incoming WebSockets connect
-    route("websocket.connect", connect_work, path=r'^/works/works/(?P<pk>[^/]+)/stream/$'),
+    route("websocket.connect", connect_work, path=r'^/dashboard/(?P<pk>[^/]+)/stream/$'),
 
     # Called when the client closes the socket
-    route("websocket.disconnect", disconnect_work, path=r'^/works/works/(?P<pk>[^/]+)/stream/$'),
+    route("websocket.disconnect", disconnect_work, path=r'^/dashboard/(?P<pk>[^/]+)/stream/$'),
 ]
