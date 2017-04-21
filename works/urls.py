@@ -16,6 +16,7 @@ router.register(r'art_works', views.ArtWorkViewSet, base_name='art_works')
 router.register(r'files', views.FileViewSet, base_name='files')
 router.register(r'work_designer', views.WorkDesignerViewSet, base_name='work_designer')
 router.register(r'status_changes', views.StatusChangeViewSet, base_name='status_changes')
+router.register(r'notifications', views.NotificationViewSet, base_name='notifications')
 
 urlpatterns = [
     url(r'^', include(router.urls)),

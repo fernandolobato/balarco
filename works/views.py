@@ -349,3 +349,12 @@ class StatusChangeViewSet(utils.GenericViewSet):
     queryset = models.StatusChange.objects.filter(is_active=True)
     serializer_class = serializers.StatusChangeSerializer
     filter_class = works_filters.StatusChangeFilter
+
+
+class NotificationViewSet(utils.GenericViewSet):
+    """ViewSet for Notification CRUD REST Service that inherits from utils.GenericViewSet
+    """
+    obj_class = models.Notification
+    queryset = models.Notification.objects.filter(is_active=True)
+    serializer_class = serializers.NotificationSerializer
+    filter_class = works_filters.NotificationFilter

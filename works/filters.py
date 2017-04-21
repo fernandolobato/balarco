@@ -81,3 +81,9 @@ class StatusChangeFilter(django_filters.rest_framework.FilterSet):
     class Meta:
         model = works_models.StatusChange
         fields = ['id', 'work', 'status', 'user', 'date']
+
+
+class NotificationFilter(django_filters.rest_framework.FilterSet):
+    class Meta:
+        model = works_models.Notification
+        fields = ['id', 'work', 'user', 'date', 'seen']
