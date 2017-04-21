@@ -1,10 +1,13 @@
 from django.contrib.auth.models import Group
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import serializers as serializers_library
 from . import models, serializers
 from . import filters as users_filters
 from balarco import utils
+from works.models import Work
 
 
 class UserViewSet(utils.GenericViewSet):
@@ -63,6 +66,25 @@ class UserViewSet(utils.GenericViewSet):
 
     def partial_update(self, request, pk=None):
         return self.update(request, pk)
+
+    def destroy(self, request, pk=None):
+        """Override of destroy method, with raises an exception when the selected
+           user to delete belongs to a work object via executive relationship
+        """
+        queryset = self.obj_class.objects.filter(is_active=True)
+        obj = get_object_or_404(queryset, pk=pk)
+        works_queryset = Work.objects.filter(executive=obj)
+        error_message = 'Antes de eliminar al usuario, reasigna todos sus proyectos'
+        if works_queryset.count() > 0:
+            raise serializers_library.ValidationError(error_message)
+        else:
+            obj.is_active = False
+            try:
+                obj.save()
+                serializer = self.serializer_class(queryset, many=True)
+                return Response(serializer.data, status.HTTP_200_OK)
+            except:
+                raise Http404('No se pudo borrar el usuario en este momento')
 
 
 class GroupViewSet(utils.GenericViewSet):
