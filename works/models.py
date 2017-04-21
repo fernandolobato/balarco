@@ -205,14 +205,16 @@ class Work(models.Model):
     def save(self, *args, **kwargs):
         if self.pk is None:
             self.creation_date = datetime.date.today()
-        self.get_related_users()
-        if self.current_status.status_id == Status.STATUS_POR_COBRAR:
+        for related_user in self.get_related_users():
+            Notification.objects.create(work=self, user=related_user, text="Cambio en el proyecto")
+        if self.current_status.status_id == Status.STATUS_CUENTAS:
             self.deactivate_work_designers_relations()
         self.send_notification()
         super(Work, self).save(*args, **kwargs)
 
     def deactivate_work_designers_relations(self):
-        work_designers = self.work_designers.all()
+        work_designers = [work_designer for work_designer in self.work_designers.all()
+                          if work_designer.active_work == True]
         for work_designer in work_designers:
             work_designer.active_work = False
             work_designer.save()
@@ -403,6 +405,11 @@ class WorkDesigner(models.Model):
             self.start_date = timezone.now()
         if not self.active_work:
             self.end_date = timezone.now()
+            Notification.objects.create(work=self.work, user=self.designer,
+                                        text="Proyecto desasignado")
+        else:
+            Notification.objects.create(work=self.work, user=self.designer,
+                                        text="Proyecto asignado")
         super(WorkDesigner, self).save(*args, **kwargs)
 
 
