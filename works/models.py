@@ -451,11 +451,12 @@ class Notification(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return '{} - {} - {} - {}'.format(self.work, self.user, self.date, self.text)
+        return '{} - {} - {} - {} - {}'.format(self.work, self.user, self.date, self.text, self.seen)
 
     def save(self, *args, **kwargs):
         send_notif = self.pk == None
-        self.date = timezone.now()
+        if self.pk == None:
+            self.date = timezone.now()
         super(Notification, self).save(*args, **kwargs)
         if send_notif:
             self.send_notification()

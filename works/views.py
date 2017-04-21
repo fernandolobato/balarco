@@ -1,6 +1,6 @@
 import csv
 
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import detail_route, list_route
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
@@ -358,3 +358,19 @@ class NotificationViewSet(utils.GenericViewSet):
     queryset = models.Notification.objects.filter(is_active=True)
     serializer_class = serializers.NotificationSerializer
     filter_class = works_filters.NotificationFilter
+
+    @list_route(methods=['get'], url_path='read_all')
+    def report(self, request):
+        user = request.user
+        unseen_notifications = models.Notification.objects.filter(user=user, seen=False)
+        for notification in unseen_notifications:
+            notification.seen = True
+            notification.save()
+        return self.list(request)
+
+    @list_route(methods=['get'], url_path='unseen_notifications')
+    def report(self, request):
+        user = request.user
+        queryset = models.Notification.objects.filter(is_active=True, user=user, seen=False)
+        serializer = serializers.NotificationSerializer(queryset, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
