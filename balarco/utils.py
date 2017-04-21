@@ -29,6 +29,22 @@ GROUPS = (
     )
 
 
+NOTIF_TYPE_ASSIGNMENT = 0
+NOTIF_TYPE_END_ASSIGNMENT = 1
+NOTIF_TYPE_WORK_CHANGE = 2
+
+def notification_text(notification_type, work):
+    text = ''
+    if notification_type == NOTIF_TYPE_ASSIGNMENT:
+        text = 'Se te ha asignado el proyecto: {}'.format(work.name)
+    elif notification_type == NOTIF_TYPE_END_ASSIGNMENT:
+        text = 'Se te ha quitado la asignación del proyecto: {}'.format(work.name)
+    elif notification_type == NOTIF_TYPE_WORK_CHANGE:
+        text = 'Ha habido cambios en el proyecto: {}'.format(work.name)
+
+    return text
+
+
 def save_object_from_data(obj_class, serializer_class, data):
     obj_serializer = serializer_class(data=data)
     if obj_serializer.is_valid():

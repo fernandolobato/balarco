@@ -192,7 +192,8 @@ class Work(models.Model):
         if self.pk is None:
             self.creation_date = datetime.date.today()
         for related_user in self.get_related_users():
-            Notification.objects.create(work=self, user=related_user, text="Cambio en el proyecto")
+            text = utils.notification_text(utils.NOTIF_TYPE_WORK_CHANGE, self)
+            Notification.objects.create(work=self, user=related_user, text=text)
         if self.current_status.status_id == Status.STATUS_CUENTAS:
             self.deactivate_work_designers_relations()
         super(Work, self).save(*args, **kwargs)
@@ -390,11 +391,11 @@ class WorkDesigner(models.Model):
             self.start_date = timezone.now()
         if not self.active_work:
             self.end_date = timezone.now()
-            Notification.objects.create(work=self.work, user=self.designer,
-                                        text="Proyecto desasignado")
+            text = utils.notification_text(utils.NOTIF_TYPE_END_ASSIGNMENT, self.work)
+            Notification.objects.create(work=self.work, user=self.designer, text=text)
         else:
-            Notification.objects.create(work=self.work, user=self.designer,
-                                        text="Proyecto asignado")
+            text = utils.notification_text(utils.NOTIF_TYPE_ASSIGNMENT, self.work)
+            Notification.objects.create(work=self.work, user=self.designer, text=text)
         super(WorkDesigner, self).save(*args, **kwargs)
 
 
