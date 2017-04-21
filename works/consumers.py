@@ -9,7 +9,7 @@ def connect_work(message, pk):
     @TODO: Connect socket to correct group depending on user id
     """
     message.reply_channel.send({"accept": True})
-    Group("user-1").add(message.reply_channel)
+    Group("user-2").add(message.reply_channel)
 
 
 def disconnect_work(message, pk):
@@ -19,4 +19,4 @@ def disconnect_work(message, pk):
 
     @TODO: Disconnect socket to correct group depending on user id
     """
-    Group("user-1").discard(message.reply_channel)
+    Group("user-2").discard(message.reply_channel)

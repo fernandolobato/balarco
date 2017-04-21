@@ -188,20 +188,6 @@ class Work(models.Model):
     def __str__(self):
         return '{}'.format(self.name)
 
-    def send_notification(self):
-        """Sends a notification to everyone in our Liveblog's group with our
-        content.
-        """
-        notification = {
-            "id": self.id,
-            "name": self.name,
-        }
-        users = user_models.User.objects.all()
-        for user in users:
-            Group('user-{}'.format(user.id)).send({
-                "text": json.dumps(notification),
-                })
-
     def save(self, *args, **kwargs):
         if self.pk is None:
             self.creation_date = datetime.date.today()
@@ -209,7 +195,6 @@ class Work(models.Model):
             Notification.objects.create(work=self, user=related_user, text="Cambio en el proyecto")
         if self.current_status.status_id == Status.STATUS_CUENTAS:
             self.deactivate_work_designers_relations()
-        self.send_notification()
         super(Work, self).save(*args, **kwargs)
 
     def deactivate_work_designers_relations(self):
@@ -468,5 +453,19 @@ class Notification(models.Model):
         return '{} - {} - {} - {}'.format(self.work, self.user, self.date, self.text)
 
     def save(self, *args, **kwargs):
+        send_notif = self.pk == None
         self.date = timezone.now()
         super(Notification, self).save(*args, **kwargs)
+        if send_notif:
+            self.send_notification()
+
+    def send_notification(self):
+        """Sends a notification to the user.
+        """
+        notification = {
+            "id": self.id,
+            "text": self.text,
+        }
+        Group('user-{}'.format(self.user.id)).send({
+            "text": json.dumps(notification),
+            })
