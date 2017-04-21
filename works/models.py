@@ -206,8 +206,16 @@ class Work(models.Model):
         if self.pk is None:
             self.creation_date = datetime.date.today()
         self.get_related_users()
+        if self.current_status.status_id == Status.STATUS_POR_COBRAR:
+            self.deactivate_work_designers_relations()
         self.send_notification()
         super(Work, self).save(*args, **kwargs)
+
+    def deactivate_work_designers_relations(self):
+        work_designers = self.work_designers.all()
+        for work_designer in work_designers:
+            work_designer.active_work = False
+            work_designer.save()
 
     def get_possible_status_ids(self, user):
         possible_status_ids = set()
