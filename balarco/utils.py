@@ -33,6 +33,7 @@ NOTIF_TYPE_ASSIGNMENT = 0
 NOTIF_TYPE_END_ASSIGNMENT = 1
 NOTIF_TYPE_WORK_CHANGE = 2
 
+
 def notification_text(notification_type, work):
     text = ''
     if notification_type == NOTIF_TYPE_ASSIGNMENT:
