@@ -4,9 +4,11 @@ from rest_framework.decorators import detail_route
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import serializers as serializers_library
 from django.db import transaction
 from django.http import HttpResponse
 from django.utils import timezone
+from django.http import Http404
 
 from . import models, serializers
 from . import filters as works_filters
@@ -38,6 +40,25 @@ class IgualaViewSet(utils.GenericViewSet):
     queryset = models.Iguala.objects.filter(is_active=True)
     serializer_class = serializers.IgualaSerializer
     filter_class = works_filters.IgualaFilter
+
+    def destroy(self, request, pk=None):
+        """Override of destroy method, with raises an exception when the selected
+           user to delete belongs to a work object via iguala relationship
+        """
+        queryset = self.obj_class.objects.filter(is_active=True)
+        obj = get_object_or_404(queryset, pk=pk)
+        work_queryset = models.Work.objects.filter(iguala=obj)
+        error_message = 'Antes de eliminar la iguala, reasigna todos los proyectos'
+        if work_queryset.count() > 0:
+            raise serializers_library.ValidationError(error_message)
+        else:
+            obj.is_active = False
+            try:
+                obj.save()
+                serializer = self.serializer_class(queryset, many=True)
+                return Response(serializer.data, status.HTTP_200_OK)
+            except:
+                return Http404('No se pudo borrar la iguala en este momento')
 
     @transaction.atomic
     def create(self, request):
