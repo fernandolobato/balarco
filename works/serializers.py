@@ -70,10 +70,13 @@ class WorkDesignerSerializer(serializers.ModelSerializer):
 
     start_date = serializers.DateTimeField(read_only=True)
     end_date = serializers.DateTimeField(read_only=True)
+    designer_name = serializers.CharField(source='designer.first_name', read_only=True)
+    designer_last_name = serializers.CharField(source='designer.last_name', read_only=True)
 
     class Meta:
         model = models.WorkDesigner
-        fields = ('id', 'designer', 'work', 'start_date', 'end_date', 'active_work',)
+        fields = ('id', 'designer', 'designer_name', 'designer_last_name', 'work',
+                  'start_date', 'end_date', 'active_work',)
 
 
 class StatusChangeSerializer(serializers.ModelSerializer):
