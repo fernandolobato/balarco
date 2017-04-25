@@ -1,6 +1,6 @@
 import csv
 
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import detail_route, list_route
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
@@ -192,6 +192,16 @@ class WorkViewSet(utils.GenericViewSet):
     queryset = models.Work.objects.filter(is_active=True)
     serializer_class = serializers.WorkSerializer
     filter_class = works_filters.WorkFilter
+
+    @list_route(methods=['get'], url_path='my_assignments')
+    def my_assignments(self, request):
+        user = request.user
+        asigned_works = user.asigned_works.filter(active_work=True)
+        works = set()
+        for asigned_work in asigned_works:
+            works.add(asigned_work.work)
+        serializer = serializers.WorkSerializer(works, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
 
     @detail_route(methods=['get'], url_path='possible-status-changes')
     def possible_status_changes(self, request, pk=None):
