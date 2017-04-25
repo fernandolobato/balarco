@@ -203,6 +203,18 @@ class WorkViewSet(utils.GenericViewSet):
         serializer = serializers.WorkSerializer(works, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
+    @list_route(methods=['get'], url_path='unassigned_works')
+    def unassigned_works(self, request):
+        works = models.Work.objects.filter(is_active=True)
+        unassigned_works = set()
+        for work in works:
+            work_designers = work.work_designers.filter(active_work=True)
+            current_status_id = work.current_status.status_id
+            if current_status_id == models.Status.STATUS_DISENO and len(work_designers) == 0:
+                unassigned_works.add(work)
+        serializer = serializers.WorkSerializer(unassigned_works, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+
     @detail_route(methods=['get'], url_path='possible-status-changes')
     def possible_status_changes(self, request, pk=None):
         queryset = models.Work.objects.filter(is_active=True)
