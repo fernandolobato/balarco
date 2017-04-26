@@ -51,7 +51,7 @@ class WorkFilter(django_filters.rest_framework.FilterSet):
                                                            lookup_expr='lte')
     client = django_filters.NumberFilter(name='contact__client')
     current_status_id = django_filters.MultipleChoiceFilter(name='current_status__status_id',
-                                                         choices=works_models.Status.STATUS)
+                                                            choices=works_models.Status.STATUS)
 
     class Meta:
         model = works_models.Work
