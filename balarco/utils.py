@@ -32,6 +32,7 @@ GROUPS = (
 NOTIF_TYPE_ASSIGNMENT = 0
 NOTIF_TYPE_END_ASSIGNMENT = 1
 NOTIF_TYPE_WORK_CHANGE = 2
+NOTIF_TYPE_USERS_TABLE_CHANGE = 3
 
 
 def notification_text(notification_type, work):

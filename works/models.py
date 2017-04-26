@@ -193,7 +193,8 @@ class Work(models.Model):
         super(Work, self).save(*args, **kwargs)
         for related_user in self.get_related_users():
             text = utils.notification_text(utils.NOTIF_TYPE_WORK_CHANGE, self)
-            Notification.objects.create(work=self, user=related_user, text=text)
+            Notification.objects.create(work=self, user=related_user, text=text,
+                                        notif_type=utils.NOTIF_TYPE_WORK_CHANGE)
         if self.current_status.status_id == Status.STATUS_CUENTAS:
             self.deactivate_work_designers_relations()
 
@@ -391,10 +392,12 @@ class WorkDesigner(models.Model):
         if not self.active_work:
             self.end_date = timezone.now()
             text = utils.notification_text(utils.NOTIF_TYPE_END_ASSIGNMENT, self.work)
-            Notification.objects.create(work=self.work, user=self.designer, text=text)
+            Notification.objects.create(work=self.work, user=self.designer, text=text,
+                                        notif_type=utils.NOTIF_TYPE_END_ASSIGNMENT)
         else:
             text = utils.notification_text(utils.NOTIF_TYPE_ASSIGNMENT, self.work)
-            Notification.objects.create(work=self.work, user=self.designer, text=text)
+            Notification.objects.create(work=self.work, user=self.designer, text=text,
+                                        notif_type=utils.NOTIF_TYPE_ASSIGNMENT)
         super(WorkDesigner, self).save(*args, **kwargs)
 
 
@@ -444,6 +447,7 @@ class Notification(models.Model):
     work = models.ForeignKey(Work, related_name='notifications', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='notifications', on_delete=models.CASCADE)
 
+    notif_type = models.IntegerField()
     date = models.DateTimeField(blank=True, null=True)
     text = models.CharField(max_length=2000)
     seen = models.BooleanField(default=False)
@@ -465,9 +469,10 @@ class Notification(models.Model):
         """Sends a notification to the user.
         """
         notification = {
-            "id": self.id,
-            "text": self.text,
+            'id': self.id,
+            'notif_type': self.notif_type,
+            'text': self.text,
         }
         Group('user-{}'.format(self.user.id)).send({
-            "text": json.dumps(notification),
+            'text': json.dumps(notification),
             })
