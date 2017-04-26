@@ -125,3 +125,13 @@ class WorkSerializer(serializers.ModelSerializer):
                   'work_designers',
                   'status_changes'
                   )
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+
+    # work_complete = WorkSerializer(source='work', read_only=True)
+    # user_complete = user_serializers.UserSerializer(source='user', read_only=True)
+
+    class Meta:
+        model = models.Notification
+        fields = ('id', 'work', 'user', 'date', 'text', 'seen')

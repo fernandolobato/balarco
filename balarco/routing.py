@@ -6,14 +6,37 @@ same URL if we wanted; Daphne separates by protocol as it negotiates with a brow
 """
 
 from channels import route
-from works.consumers import connect_work, disconnect_work
+from works import consumers as work_consumers
+from users import consumers as user_consumers
+from clients import consumers as client_consumers
 
 
 channel_routing = [
     # @TODO: Correct urls
     # Called when incoming WebSockets connect
-    route("websocket.connect", connect_work, path=r'^/works/works/(?P<pk>[^/]+)/stream/$'),
-
+    route("websocket.connect", work_consumers.connect_work,
+          path=r'^/works/stream/(?P<pk>[^/]+)$'),
     # Called when the client closes the socket
-    route("websocket.disconnect", disconnect_work, path=r'^/works/works/(?P<pk>[^/]+)/stream/$'),
+    route("websocket.disconnect", work_consumers.disconnect_work,
+          path=r'^/works/stream/(?P<pk>[^/]+)$'),
+
+    route("websocket.connect", user_consumers.connect_users_table,
+          path=r'^/users/stream/$'),
+    route("websocket.disconnect", user_consumers.disconnect_users_table,
+          path=r'^/users/stream/$'),
+
+    route("websocket.connect", client_consumers.connect_clients_table,
+          path=r'^/clients/stream/$'),
+    route("websocket.disconnect", client_consumers.disconnect_clients_table,
+          path=r'^/clients/stream/$'),
+
+    route("websocket.connect", client_consumers.connect_contacts_table,
+          path=r'^/contacts/stream/$'),
+    route("websocket.disconnect", client_consumers.disconnect_contacts_table,
+          path=r'^/contacts/stream/$'),
+
+    route("websocket.connect", work_consumers.connect_igualas_table,
+          path=r'^/igualas/stream/$'),
+    route("websocket.disconnect", work_consumers.disconnect_igualas_table,
+          path=r'^/igualas/stream/$'),
 ]

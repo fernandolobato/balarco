@@ -392,3 +392,28 @@ class StatusChangeViewSet(utils.GenericViewSet):
     queryset = models.StatusChange.objects.filter(is_active=True)
     serializer_class = serializers.StatusChangeSerializer
     filter_class = works_filters.StatusChangeFilter
+
+
+class NotificationViewSet(utils.GenericViewSet):
+    """ViewSet for Notification CRUD REST Service that inherits from utils.GenericViewSet
+    """
+    obj_class = models.Notification
+    queryset = models.Notification.objects.filter(is_active=True)
+    serializer_class = serializers.NotificationSerializer
+    filter_class = works_filters.NotificationFilter
+
+    @list_route(methods=['get'], url_path='read_all')
+    def read_all(self, request):
+        user = request.user
+        unseen_notifications = models.Notification.objects.filter(user=user, seen=False)
+        for notification in unseen_notifications:
+            notification.seen = True
+            notification.save()
+        return self.unseen_notifications(request)
+
+    @list_route(methods=['get'], url_path='unseen_notifications')
+    def unseen_notifications(self, request):
+        user = request.user
+        queryset = models.Notification.objects.filter(is_active=True, user=user, seen=False)
+        serializer = serializers.NotificationSerializer(queryset, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
