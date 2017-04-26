@@ -15,10 +15,10 @@ channel_routing = [
     # @TODO: Correct urls
     # Called when incoming WebSockets connect
     route("websocket.connect", work_consumers.connect_work,
-          path=r'^/dashboard/(?P<pk>[^/]+)/stream/$'),
+          path=r'^/works/stream/(?P<pk>[^/]+)$'),
     # Called when the client closes the socket
     route("websocket.disconnect", work_consumers.disconnect_work,
-          path=r'^/dashboard/(?P<pk>[^/]+)/stream/$'),
+          path=r'^/works/stream/(?P<pk>[^/]+)$'),
 
     route("websocket.connect", user_consumers.connect_users_table,
           path=r'^/users/stream/$'),
