@@ -34,4 +34,9 @@ channel_routing = [
           path=r'^/contacts/stream/$'),
     route("websocket.disconnect", client_consumers.disconnect_contacts_table,
           path=r'^/contacts/stream/$'),
+
+    route("websocket.connect", work_consumers.connect_igualas_table,
+          path=r'^/igualas/stream/$'),
+    route("websocket.disconnect", work_consumers.disconnect_igualas_table,
+          path=r'^/igualas/stream/$'),
 ]

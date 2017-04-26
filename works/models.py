@@ -83,6 +83,20 @@ class Iguala(models.Model):
     def __str__(self):
         return '{}'.format(self.name)
 
+    def save(self, *args, **kwargs):
+        """Override of save function.
+        """
+        super(Iguala, self).save(*args, **kwargs)
+        """Sends a notification to the user.
+        """
+        notification = {
+            'notif_type': utils.NOTIF_TYPE_IGUALAS_TABLE_CHANGE,
+            'text': "Se ha actualizado la tabla de igualas",
+        }
+        Group('igualas-table').send({
+            'text': json.dumps(notification),
+            })
+
 
 class ArtIguala(models.Model):
     """ The model that represents the quantity and kind of arts that an Iguala contains.
