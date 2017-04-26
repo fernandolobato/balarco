@@ -8,6 +8,7 @@ same URL if we wanted; Daphne separates by protocol as it negotiates with a brow
 from channels import route
 from works import consumers as work_consumers
 from users import consumers as user_consumers
+from clients import consumers as client_consumers
 
 
 channel_routing = [
@@ -21,4 +22,9 @@ channel_routing = [
     	  path=r'^/users/stream/$'),
     route("websocket.disconnect", user_consumers.disconnect_users_table,
     	  path=r'^/users/stream/$'),
+
+    route("websocket.connect", client_consumers.connect_clients_table,
+    	  path=r'^/clients/stream/$'),
+    route("websocket.disconnect", client_consumers.disconnect_clients_table,
+    	  path=r'^/clients/stream/$'),
 ]

@@ -1,4 +1,7 @@
+import json
+
 from django.db import models
+from channels import Group
 
 
 class Client(models.Model):
@@ -21,6 +24,15 @@ class Client(models.Model):
                 contact.is_active = False
                 contact.save()
         super(Client, self).save(*args, **kwargs)
+        """Sends a notification to the user.
+        """
+        notification = {
+            'notif_type': utils.NOTIF_TYPE_CLIENTS_TABLE_CHANGE,
+            'text': "Se ha actualizado la tabla de clientes",
+        }
+        Group('clients-table').send({
+            'text': json.dumps(notification),
+            })
 
 
 class Contact(models.Model):
