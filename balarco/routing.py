@@ -29,4 +29,9 @@ channel_routing = [
           path=r'^/clients/stream/$'),
     route("websocket.disconnect", client_consumers.disconnect_clients_table,
           path=r'^/clients/stream/$'),
+
+    route("websocket.connect", client_consumers.connect_contacts_table,
+          path=r'^/contacts/stream/$'),
+    route("websocket.disconnect", client_consumers.disconnect_contacts_table,
+          path=r'^/contacts/stream/$'),
 ]

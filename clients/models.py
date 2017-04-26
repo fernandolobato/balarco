@@ -53,3 +53,17 @@ class Contact(models.Model):
 
     def __str__(self):
         return '{} {}'.format(self.name, self.last_name)
+
+    def save(self, *args, **kwargs):
+        """Override of save function.
+        """
+        super(Contact, self).save(*args, **kwargs)
+        """Sends a notification to the user.
+        """
+        notification = {
+            'notif_type': utils.NOTIF_TYPE_CONTACTS_TABLE_CHANGE,
+            'text': "Se ha actualizado la tabla de contactos",
+        }
+        Group('contacts-table').send({
+            'text': json.dumps(notification),
+            })
