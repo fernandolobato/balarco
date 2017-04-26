@@ -14,17 +14,19 @@ from clients import consumers as client_consumers
 channel_routing = [
     # @TODO: Correct urls
     # Called when incoming WebSockets connect
-    route("websocket.connect", work_consumers.connect_work, path=r'^/dashboard/(?P<pk>[^/]+)/stream/$'),
+    route("websocket.connect", work_consumers.connect_work,
+          path=r'^/dashboard/(?P<pk>[^/]+)/stream/$'),
     # Called when the client closes the socket
-    route("websocket.disconnect", work_consumers.disconnect_work, path=r'^/dashboard/(?P<pk>[^/]+)/stream/$'),
+    route("websocket.disconnect", work_consumers.disconnect_work,
+          path=r'^/dashboard/(?P<pk>[^/]+)/stream/$'),
 
     route("websocket.connect", user_consumers.connect_users_table,
-    	  path=r'^/users/stream/$'),
+          path=r'^/users/stream/$'),
     route("websocket.disconnect", user_consumers.disconnect_users_table,
-    	  path=r'^/users/stream/$'),
+          path=r'^/users/stream/$'),
 
     route("websocket.connect", client_consumers.connect_clients_table,
-    	  path=r'^/clients/stream/$'),
+          path=r'^/clients/stream/$'),
     route("websocket.disconnect", client_consumers.disconnect_clients_table,
-    	  path=r'^/clients/stream/$'),
+          path=r'^/clients/stream/$'),
 ]

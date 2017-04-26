@@ -3,6 +3,8 @@ import json
 from django.db import models
 from channels import Group
 
+from balarco import utils
+
 
 class Client(models.Model):
     name = models.CharField(max_length=100)
