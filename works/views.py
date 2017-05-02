@@ -317,7 +317,8 @@ class WorkViewSet(utils.GenericViewSet):
                 name = request.FILES[filename].name
                 models.File.objects.create(work=updated_obj, filename=name, upload=file)
 
-            if 'work_designers' in request.data:
+            if 'work_designers' in request.data and \
+               updated_obj.current_status.status_id == models.Status.STATUS_DISENO:
                 work_designers = request.data['work_designers']
                 for work_designer in work_designers:
                     work_designer['work'] = updated_obj.id
