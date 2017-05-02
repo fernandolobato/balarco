@@ -224,6 +224,12 @@ class WorkViewSet(utils.GenericViewSet):
             works.add(asigned_work.work)
         for managed_work in managed_works:
             works.add(managed_work)
+        if user.groups.filter(name=utils.GROUP_ADMINISTRACION).exists():
+            admin_works = models.Work.objects.filter(active_work=True,
+                                                     current_status__status_id__gte=5
+                                                     current_status__status_id__lte=7)
+            for admin_work in admin_works:
+                works.add(admin_work)
         serializer = serializers.WorkSerializer(works, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
