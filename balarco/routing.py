@@ -15,28 +15,28 @@ channel_routing = [
     # @TODO: Correct urls
     # Called when incoming WebSockets connect
     route("websocket.connect", work_consumers.connect_work,
-          path=r'^/works/stream/(?P<pk>[^/]+)$'),
+          path=r'^/api/works/stream/(?P<pk>[^/]+)$'),
     # Called when the client closes the socket
     route("websocket.disconnect", work_consumers.disconnect_work,
-          path=r'^/works/stream/(?P<pk>[^/]+)$'),
+          path=r'^/api/works/stream/(?P<pk>[^/]+)$'),
 
     route("websocket.connect", user_consumers.connect_users_table,
-          path=r'^/users/stream/$'),
+          path=r'^/api/users/stream/$'),
     route("websocket.disconnect", user_consumers.disconnect_users_table,
-          path=r'^/users/stream/$'),
+          path=r'^/api/users/stream/$'),
 
     route("websocket.connect", client_consumers.connect_clients_table,
-          path=r'^/clients/stream/$'),
+          path=r'^/api/clients/stream/$'),
     route("websocket.disconnect", client_consumers.disconnect_clients_table,
-          path=r'^/clients/stream/$'),
+          path=r'^/api/clients/stream/$'),
 
     route("websocket.connect", client_consumers.connect_contacts_table,
-          path=r'^/contacts/stream/$'),
+          path=r'^/api/contacts/stream/$'),
     route("websocket.disconnect", client_consumers.disconnect_contacts_table,
-          path=r'^/contacts/stream/$'),
+          path=r'^/api/contacts/stream/$'),
 
     route("websocket.connect", work_consumers.connect_igualas_table,
-          path=r'^/igualas/stream/$'),
+          path=r'^/api/igualas/stream/$'),
     route("websocket.disconnect", work_consumers.disconnect_igualas_table,
-          path=r'^/igualas/stream/$'),
+          path=r'^/api/igualas/stream/$'),
 ]
