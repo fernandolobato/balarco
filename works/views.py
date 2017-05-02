@@ -218,9 +218,12 @@ class WorkViewSet(utils.GenericViewSet):
     def my_assignments(self, request):
         user = request.user
         asigned_works = user.asigned_works.filter(active_work=True)
+        managed_works = user.managed_works.filter(active_work=True)
         works = set()
         for asigned_work in asigned_works:
             works.add(asigned_work.work)
+        for managed_work in managed_works:
+            works.add(managed_work)
         serializer = serializers.WorkSerializer(works, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
