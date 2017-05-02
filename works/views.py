@@ -1,8 +1,14 @@
-from rest_framework.decorators import detail_route
+import csv
+
+from rest_framework.decorators import detail_route, list_route
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import serializers as serializers_library
 from django.db import transaction
+from django.http import HttpResponse
+from django.utils import timezone
+from django.http import Http404
 
 from . import models, serializers
 from . import filters as works_filters
@@ -34,6 +40,25 @@ class IgualaViewSet(utils.GenericViewSet):
     queryset = models.Iguala.objects.filter(is_active=True)
     serializer_class = serializers.IgualaSerializer
     filter_class = works_filters.IgualaFilter
+
+    def destroy(self, request, pk=None):
+        """Override of destroy method, with raises an exception when the selected
+           user to delete belongs to a work object via iguala relationship
+        """
+        queryset = self.obj_class.objects.filter(is_active=True)
+        obj = get_object_or_404(queryset, pk=pk)
+        work_queryset = models.Work.objects.filter(iguala=obj)
+        error_message = 'Antes de eliminar la iguala, reasigna todos los proyectos'
+        if work_queryset.count() > 0:
+            raise serializers_library.ValidationError(error_message)
+        else:
+            obj.is_active = False
+            try:
+                obj.save()
+                serializer = self.serializer_class(queryset, many=True)
+                return Response(serializer.data, status.HTTP_200_OK)
+            except:
+                return Http404('No se pudo borrar la iguala en este momento')
 
     @transaction.atomic
     def create(self, request):
@@ -99,6 +124,69 @@ class IgualaViewSet(utils.GenericViewSet):
     def partial_update(self, request, pk=None):
         return self.update(request, pk)
 
+    @detail_route(methods=['get'], url_path='report')
+    def report(self, request, pk=None):
+        queryset = models.Iguala.objects.filter(is_active=True)
+        iguala = get_object_or_404(queryset, pk=pk)
+        response = HttpResponse(content_type='text/csv')
+        str_now = timezone.now().strftime('%d-%m-%Y %H-%M')
+        response['Content-Disposition'] = 'attachment; filename="{}-{}.csv"'.format(iguala.name,
+                                                                                    str_now)
+
+        works = models.Work.objects.filter(is_active=True, iguala=iguala)
+        writer = csv.writer(response)
+
+        writer.writerow([iguala.name, timezone.now().strftime('%d-%m-%Y %H:%M')])
+        writer.writerow([])
+        writer.writerow([])
+
+        art_works_count = {}
+        for work in works:
+            for art_work in work.art_works.all():
+                art_type_id = art_work.art_type.id
+                if art_type_id in art_works_count:
+                    art_works_count[art_type_id] += art_work.quantity
+                else:
+                    art_works_count[art_type_id] = art_work.quantity
+
+        writer.writerow(['Tipo de arte', 'Contratadas', 'Usadas', 'Restantes'])
+
+        for art_iguala in iguala.art_iguala.all():
+            art_type_id = art_iguala.art_type.id
+            art_type_name = art_iguala.art_type.name
+            agreed = art_iguala.quantity
+            if art_type_id in art_works_count:
+                used = art_works_count[art_type_id]
+                remaining = agreed - used
+                writer.writerow([art_type_name, agreed, used, remaining])
+            else:
+                used = 0
+                remaining = agreed - used
+                writer.writerow([art_type_name, agreed, used, remaining])
+
+        writer.writerow([])
+        writer.writerow([])
+        writer.writerow(['Trabajos relacionados con la iguala'])
+
+        for work in works:
+            writer.writerow([])
+            writer.writerow([])
+            writer.writerow(['Trabajo', 'Contacto', 'Empresa', 'Fecha entrada', 'Status actual'])
+            work_name = work.name
+            contact_name = '{} {}'.format(work.contact.name, work.contact.last_name)
+            client_name = work.contact.client.name
+            creation_date = work.creation_date.strftime('%d-%m-%Y')
+            current_status = work.current_status.__str__()
+            writer.writerow([work_name, contact_name, client_name, creation_date, current_status])
+            writer.writerow([])
+            writer.writerow(['', 'Tipo de arte', 'Cantidad'])
+            for art_work in work.art_works.all():
+                art_type_name = art_work.art_type.name
+                quantity = art_work.quantity
+                writer.writerow(['', art_type_name, quantity])
+
+        return response
+
 
 class ArtIgualaViewSet(utils.GenericViewSet):
     """ViewSet for ArtIguala CRUD REST Service that inherits from utils.GenericViewSet
@@ -125,6 +213,28 @@ class WorkViewSet(utils.GenericViewSet):
     queryset = models.Work.objects.filter(is_active=True)
     serializer_class = serializers.WorkSerializer
     filter_class = works_filters.WorkFilter
+
+    @list_route(methods=['get'], url_path='my_assignments')
+    def my_assignments(self, request):
+        user = request.user
+        asigned_works = user.asigned_works.filter(active_work=True)
+        works = set()
+        for asigned_work in asigned_works:
+            works.add(asigned_work.work)
+        serializer = serializers.WorkSerializer(works, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+    @list_route(methods=['get'], url_path='unassigned_works')
+    def unassigned_works(self, request):
+        works = models.Work.objects.filter(is_active=True)
+        unassigned_works = set()
+        for work in works:
+            work_designers = work.work_designers.filter(active_work=True)
+            current_status_id = work.current_status.status_id
+            if current_status_id == models.Status.STATUS_DISENO and len(work_designers) == 0:
+                unassigned_works.add(work)
+        serializer = serializers.WorkSerializer(unassigned_works, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
 
     @detail_route(methods=['get'], url_path='possible-status-changes')
     def possible_status_changes(self, request, pk=None):
@@ -207,7 +317,8 @@ class WorkViewSet(utils.GenericViewSet):
                 name = request.FILES[filename].name
                 models.File.objects.create(work=updated_obj, filename=name, upload=file)
 
-            if 'work_designers' in request.data:
+            if 'work_designers' in request.data and \
+               updated_obj.current_status.status_id == models.Status.STATUS_DISENO:
                 work_designers = request.data['work_designers']
                 for work_designer in work_designers:
                     work_designer['work'] = updated_obj.id
@@ -282,3 +393,28 @@ class StatusChangeViewSet(utils.GenericViewSet):
     queryset = models.StatusChange.objects.filter(is_active=True)
     serializer_class = serializers.StatusChangeSerializer
     filter_class = works_filters.StatusChangeFilter
+
+
+class NotificationViewSet(utils.GenericViewSet):
+    """ViewSet for Notification CRUD REST Service that inherits from utils.GenericViewSet
+    """
+    obj_class = models.Notification
+    queryset = models.Notification.objects.filter(is_active=True)
+    serializer_class = serializers.NotificationSerializer
+    filter_class = works_filters.NotificationFilter
+
+    @list_route(methods=['get'], url_path='read_all')
+    def read_all(self, request):
+        user = request.user
+        unseen_notifications = models.Notification.objects.filter(user=user, seen=False)
+        for notification in unseen_notifications:
+            notification.seen = True
+            notification.save()
+        return self.unseen_notifications(request)
+
+    @list_route(methods=['get'], url_path='unseen_notifications')
+    def unseen_notifications(self, request):
+        user = request.user
+        queryset = models.Notification.objects.filter(is_active=True, user=user, seen=False)
+        serializer = serializers.NotificationSerializer(queryset, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)

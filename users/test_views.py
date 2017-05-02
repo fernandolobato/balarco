@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework import status
-from .models import User
+from django.contrib.auth.models import User, Group
 from . import views, serializers
 from balarco import utils
 
@@ -125,6 +125,12 @@ class UserAPITest(utils.GenericAPITest):
             'password': 'new_user_password',
             }
 
+        self.data_filtering_test = {
+            'username': 'marcoantonio@example.com',
+        }
+
+        self.number_of_filtered_objects = 1
+
         self.data_edition_test = {
             'username': 'different_address@example.com',
             }
@@ -143,5 +149,56 @@ class UserAPITest(utils.GenericAPITest):
         self.url_detail = 'users:users-detail'
         self.factory = APIRequestFactory()
 
-    def test_filters(self):
+
+class GroupAPITest(utils.GenericAPITest):
+    """Tests to verify the basic usage of the REST API to create, modify and list groups.
+    It inherits from utils.GenericAPITest and add the necessary class attributes.
+    """
+    def setUp(self):
+        self.user = User.objects.create_user(username='test_user@example.com',
+                                             password='test_password')
+        url = reverse('users:api_login')
+        data = {'username': 'test_user@example.com', 'password': 'test_password'}
+        self.client.post(url, data, format='json')
+
+        self.obj_class = Group
+        self.serializer_class = serializers.GroupSerializer
+
+        test_group_1 = Group.objects.create(
+            name='Group 1')
+        test_group_2 = Group.objects.create(
+            name='Group 2')
+
+        self.test_objects = [test_group_1, test_group_2]
+        self.number_of_initial_objects = len(self.test_objects)
+
+        self.data_creation_test = {
+            'name': 'Group 3'
+            }
+
+        self.data_filtering_test = {
+            'name': 'Group 1',
+        }
+
+        self.number_of_filtered_objects = 1
+
+        self.data_edition_test = {
+            'name': 'Group 4',
+            }
+
+        self.edition_obj_idx = 0
+
+        self.view = views.GroupViewSet.as_view({
+                                'get': 'list',
+                                'post': 'create',
+                                'put': 'update',
+                                'patch': 'partial_update',
+                                'delete': 'destroy'
+                                })
+
+        self.url_list = 'users:groups-list'
+        self.url_detail = 'users:groups-detail'
+        self.factory = APIRequestFactory()
+
+    def test_delete_object(self):
         pass

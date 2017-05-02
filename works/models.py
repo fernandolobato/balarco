@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from channels import Group
 
-from users import models as user_models
 from clients.models import Client, Contact
 from balarco import utils
 
@@ -83,6 +82,20 @@ class Iguala(models.Model):
 
     def __str__(self):
         return '{}'.format(self.name)
+
+    def save(self, *args, **kwargs):
+        """Override of save function.
+        """
+        super(Iguala, self).save(*args, **kwargs)
+        """Sends a notification to the user.
+        """
+        notification = {
+            'notif_type': utils.NOTIF_TYPE_IGUALAS_TABLE_CHANGE,
+            'text': "Se ha actualizado la tabla de igualas",
+        }
+        Group('igualas-table').send({
+            'text': json.dumps(notification),
+            })
 
 
 class ArtIguala(models.Model):
@@ -188,25 +201,23 @@ class Work(models.Model):
     def __str__(self):
         return '{}'.format(self.name)
 
-    def send_notification(self):
-        """Sends a notification to everyone in our Liveblog's group with our
-        content.
-        """
-        notification = {
-            "id": self.id,
-            "name": self.name,
-        }
-        users = user_models.User.objects.all()
-        for user in users:
-            Group('user-{}'.format(user.id)).send({
-                "text": json.dumps(notification),
-                })
-
     def save(self, *args, **kwargs):
         if self.pk is None:
             self.creation_date = datetime.date.today()
-        self.send_notification()
         super(Work, self).save(*args, **kwargs)
+        for related_user in self.get_related_users():
+            text = utils.notification_text(utils.NOTIF_TYPE_WORK_CHANGE, self)
+            Notification.objects.create(work=self, user=related_user, text=text,
+                                        notif_type=utils.NOTIF_TYPE_WORK_CHANGE)
+        if self.current_status.status_id == Status.STATUS_CUENTAS:
+            self.deactivate_work_designers_relations()
+
+    def deactivate_work_designers_relations(self):
+        work_designers = [work_designer for work_designer in self.work_designers.all()
+                          if work_designer.active_work]
+        for work_designer in work_designers:
+            work_designer.active_work = False
+            work_designer.save()
 
     def get_possible_status_ids(self, user):
         possible_status_ids = set()
@@ -216,13 +227,24 @@ class Work(models.Model):
         if self.pk is None:
             return possible_status_ids
 
+        if user.groups.filter(name=utils.GROUP_SUPERUSUARIO).exists():
+            possible_status_ids.add(Status.STATUS_PENDIENTE)
+            possible_status_ids.add(Status.STATUS_DISENO)
+            possible_status_ids.add(Status.STATUS_CUENTAS)
+            possible_status_ids.add(Status.STATUS_VALIDACION)
+            possible_status_ids.add(Status.STATUS_PRODUCCION)
+            possible_status_ids.add(Status.STATUS_POR_COBRAR)
+            possible_status_ids.add(Status.STATUS_POR_FACTURAR)
+            possible_status_ids.add(Status.STATUS_TERMINADO)
+            possible_status_ids.add(Status.STATUS_CANCELADO)
+
         if self.current_status.status_id == Status.STATUS_PENDIENTE:
             if user.groups.filter(name=utils.GROUP_DIR_CUENTAS).exists():
                 possible_status_ids.add(Status.STATUS_PENDIENTE)
                 possible_status_ids.add(Status.STATUS_DISENO)
                 possible_status_ids.add(Status.STATUS_CANCELADO)
 
-            if user.groups.filter(name=utils.GROUP_EJECUTIVO).exists():
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO_SR).exists():
                 possible_status_ids.add(Status.STATUS_PENDIENTE)
                 possible_status_ids.add(Status.STATUS_DISENO)
                 possible_status_ids.add(Status.STATUS_CANCELADO)
@@ -243,7 +265,7 @@ class Work(models.Model):
                 possible_status_ids.add(Status.STATUS_VALIDACION)
                 possible_status_ids.add(Status.STATUS_CANCELADO)
 
-            if user.groups.filter(name=utils.GROUP_EJECUTIVO):
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO_SR):
                 possible_status_ids.add(Status.STATUS_CUENTAS)
                 possible_status_ids.add(Status.STATUS_DISENO)
                 possible_status_ids.add(Status.STATUS_VALIDACION)
@@ -258,7 +280,7 @@ class Work(models.Model):
                 possible_status_ids.add(Status.STATUS_POR_COBRAR)
                 possible_status_ids.add(Status.STATUS_CANCELADO)
 
-            if user.groups.filter(name=utils.GROUP_EJECUTIVO):
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO_SR):
                 possible_status_ids.add(Status.STATUS_VALIDACION)
                 possible_status_ids.add(Status.STATUS_CUENTAS)
                 possible_status_ids.add(Status.STATUS_DISENO)
@@ -273,34 +295,45 @@ class Work(models.Model):
                 possible_status_ids.add(Status.STATUS_POR_COBRAR)
                 possible_status_ids.add(Status.STATUS_CANCELADO)
 
-            if user.groups.filter(name=utils.GROUP_EJECUTIVO):
+            if user.groups.filter(name=utils.GROUP_EJECUTIVO_SR):
                 possible_status_ids.add(Status.STATUS_PRODUCCION)
                 possible_status_ids.add(Status.STATUS_DISENO)
                 possible_status_ids.add(Status.STATUS_POR_COBRAR)
                 possible_status_ids.add(Status.STATUS_CANCELADO)
 
         elif self.current_status.status_id == Status.STATUS_POR_COBRAR:
-            pass
+            if user.groups.filter(name=utils.GROUP_ADMINISTRACION):
+                possible_status_ids.add(Status.STATUS_POR_COBRAR)
+                possible_status_ids.add(Status.STATUS_POR_FACTURAR)
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+                possible_status_ids.add(Status.STATUS_TERMINADO)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
 
         elif self.current_status.status_id == Status.STATUS_POR_FACTURAR:
-            pass
+            if user.groups.filter(name=utils.GROUP_ADMINISTRACION):
+                possible_status_ids.add(Status.STATUS_POR_FACTURAR)
+                possible_status_ids.add(Status.STATUS_CUENTAS)
+                possible_status_ids.add(Status.STATUS_TERMINADO)
+                possible_status_ids.add(Status.STATUS_CANCELADO)
 
         elif self.current_status.status_id == Status.STATUS_TERMINADO:
             pass
-
-        else:
-            if user.groups.filter(name=utils.GROUP_DIR_CUENTAS).exists():
-                possible_status_ids.add(Status.STATUS_PENDIENTE)
-                possible_status_ids.add(Status.STATUS_DISENO)
-            if user.groups.filter(name=utils.GROUP_EJECUTIVO).exists():
-                possible_status_ids.add(Status.STATUS_PENDIENTE)
-                possible_status_ids.add(Status.STATUS_DISENO)
 
         return possible_status_ids
 
     def get_possible_status_changes(self, user):
         possible_status_ids = self.get_possible_status_ids(user)
         return Status.objects.filter(status_id__in=possible_status_ids)
+
+    def get_related_users(self):
+        work_designers = [work_designer.designer for work_designer in self.work_designers.all()
+                          if work_designer.active_work]
+        executive = [self.executive]
+        related_users = set()
+        related_users_list = work_designers + executive
+        for related_user in related_users_list:
+            related_users.add(related_user)
+        return related_users
 
 
 class ArtWork(models.Model):
@@ -372,6 +405,13 @@ class WorkDesigner(models.Model):
             self.start_date = timezone.now()
         if not self.active_work:
             self.end_date = timezone.now()
+            text = utils.notification_text(utils.NOTIF_TYPE_END_ASSIGNMENT, self.work)
+            Notification.objects.create(work=self.work, user=self.designer, text=text,
+                                        notif_type=utils.NOTIF_TYPE_END_ASSIGNMENT)
+        else:
+            text = utils.notification_text(utils.NOTIF_TYPE_ASSIGNMENT, self.work)
+            Notification.objects.create(work=self.work, user=self.designer, text=text,
+                                        notif_type=utils.NOTIF_TYPE_ASSIGNMENT)
         super(WorkDesigner, self).save(*args, **kwargs)
 
 
@@ -384,6 +424,8 @@ class StatusChange(models.Model):
         Relation with the work.
     status: ForeignKey
         Relation with the Status model that indicates the status in that date.
+    user: ForeignKey
+        Relation with the user.
     """
     work = models.ForeignKey(Work, related_name='status_changes', on_delete=models.CASCADE)
     status = models.ForeignKey(Status, related_name='status_changes', on_delete=models.CASCADE)
@@ -398,3 +440,53 @@ class StatusChange(models.Model):
     def save(self, *args, **kwargs):
         self.date = timezone.now()
         super(StatusChange, self).save(*args, **kwargs)
+
+
+class Notification(models.Model):
+    """ Model that represents a notification related to a work.
+
+    Attributes:
+    -----------
+    work: ForeignKey
+        Relation with the work.
+    user: ForeignKey
+        Relation with the user.
+    date: DateTimeField
+        Date when the notification was created.
+    text: CharField
+        Text of the notification.
+    seen: BooleanField
+        Boolean that represents if the notification has been seen by the user.
+    """
+    work = models.ForeignKey(Work, related_name='notifications', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='notifications', on_delete=models.CASCADE)
+
+    notif_type = models.IntegerField()
+    date = models.DateTimeField(blank=True, null=True)
+    text = models.CharField(max_length=2000)
+    seen = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return '{} - {} - {} - {} - {}'.format(self.work, self.user, self.date,
+                                               self.text, self.seen)
+
+    def save(self, *args, **kwargs):
+        send_notif = self.pk is None
+        if self.pk is None:
+            self.date = timezone.now()
+        super(Notification, self).save(*args, **kwargs)
+        if send_notif:
+            self.send_notification()
+
+    def send_notification(self):
+        """Sends a notification to the user.
+        """
+        notification = {
+            'id': self.id,
+            'notif_type': self.notif_type,
+            'text': self.text,
+        }
+        Group('user-{}'.format(self.user.id)).send({
+            'text': json.dumps(notification),
+            })

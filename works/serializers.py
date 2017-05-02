@@ -70,10 +70,13 @@ class WorkDesignerSerializer(serializers.ModelSerializer):
 
     start_date = serializers.DateTimeField(read_only=True)
     end_date = serializers.DateTimeField(read_only=True)
+    designer_name = serializers.CharField(source='designer.first_name', read_only=True)
+    designer_last_name = serializers.CharField(source='designer.last_name', read_only=True)
 
     class Meta:
         model = models.WorkDesigner
-        fields = ('id', 'designer', 'work', 'start_date', 'end_date', 'active_work',)
+        fields = ('id', 'designer', 'designer_name', 'designer_last_name', 'work',
+                  'start_date', 'end_date', 'active_work',)
 
 
 class StatusChangeSerializer(serializers.ModelSerializer):
@@ -122,3 +125,13 @@ class WorkSerializer(serializers.ModelSerializer):
                   'work_designers',
                   'status_changes'
                   )
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+
+    # work_complete = WorkSerializer(source='work', read_only=True)
+    # user_complete = user_serializers.UserSerializer(source='user', read_only=True)
+
+    class Meta:
+        model = models.Notification
+        fields = ('id', 'work', 'user', 'date', 'text', 'seen')

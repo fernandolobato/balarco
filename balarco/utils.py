@@ -8,13 +8,46 @@ from rest_framework.test import APITestCase, APIRequestFactory, force_authentica
 from rest_framework.authtoken.models import Token
 
 
+GROUP_SUPERUSUARIO = "Super usuario"
 GROUP_DIR_CUENTAS = "Director de cuentas"
-GROUP_EJECUTIVO = "Ejecutivo"
-GROUP_VENTAS = "Ventas"
+GROUP_EJECUTIVO_SR = "Ejecutivo SR"
+GROUP_EJECUTIVO_JR = "Ejecutivo JR"
+GROUP_ADMINISTRACION = "Administración"
 GROUP_DIR_ARTE = "Director de arte"
 GROUP_DISENADOR_SR = "Diseñador SR"
 GROUP_DISENADOR_JR = "Diseñador JR"
-GROUP_SUPERUSUARIO = "Super usuario"
+
+GROUPS = (
+    (GROUP_SUPERUSUARIO, GROUP_SUPERUSUARIO),
+    (GROUP_DIR_CUENTAS, GROUP_DIR_CUENTAS),
+    (GROUP_EJECUTIVO_SR, GROUP_EJECUTIVO_SR),
+    (GROUP_EJECUTIVO_JR, GROUP_EJECUTIVO_JR),
+    (GROUP_ADMINISTRACION, GROUP_ADMINISTRACION),
+    (GROUP_DIR_ARTE, GROUP_DIR_ARTE),
+    (GROUP_DISENADOR_SR, GROUP_DISENADOR_SR),
+    (GROUP_DISENADOR_JR, GROUP_DISENADOR_JR)
+    )
+
+
+NOTIF_TYPE_ASSIGNMENT = 0
+NOTIF_TYPE_END_ASSIGNMENT = 1
+NOTIF_TYPE_WORK_CHANGE = 2
+NOTIF_TYPE_USERS_TABLE_CHANGE = 3
+NOTIF_TYPE_CLIENTS_TABLE_CHANGE = 4
+NOTIF_TYPE_CONTACTS_TABLE_CHANGE = 5
+NOTIF_TYPE_IGUALAS_TABLE_CHANGE = 6
+
+
+def notification_text(notification_type, work):
+    text = ''
+    if notification_type == NOTIF_TYPE_ASSIGNMENT:
+        text = 'Se te ha asignado el proyecto: {}'.format(work.name)
+    elif notification_type == NOTIF_TYPE_END_ASSIGNMENT:
+        text = 'Se te ha quitado la asignación del proyecto: {}'.format(work.name)
+    elif notification_type == NOTIF_TYPE_WORK_CHANGE:
+        text = 'Ha habido cambios en el proyecto: {}'.format(work.name)
+
+    return text
 
 
 def save_object_from_data(obj_class, serializer_class, data):
