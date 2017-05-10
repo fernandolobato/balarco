@@ -227,7 +227,6 @@ class WorkViewSet(utils.GenericViewSet):
         if user.groups.filter(name=utils.GROUP_ADMINISTRACION).exists():
             admin_works = models.Work.objects.filter(is_active=True,
                                                      current_status__status_id__range=(5, 6))
-                                                     # current_status__status_id__lte=7)
             for admin_work in admin_works:
                 works.add(admin_work)
         serializer = serializers.WorkSerializer(works, many=True)
